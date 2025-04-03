@@ -10,11 +10,12 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
+import { debounceTime, distinctUntilChanged } from 'rxjs';
 
 
 @Component({
   selector: 'app-tasks',
-  imports: [CommonModule, RouterModule, ReactiveFormsModule],
+  imports: [CommonModule, RouterModule, ReactiveFormsModule,],
   templateUrl: './tasks.component.html',
   styleUrls: ['./tasks.component.scss']
 })
@@ -23,20 +24,34 @@ export class TasksComponent implements OnInit {
 
   tasks: Task[] = [];
   taskForm: FormGroup;
+  filteredTasks: Task[] = [];
+  searchControl: FormControl;
 
   constructor(private taskService: TaskService) {
     this.taskForm = new FormGroup({
       title: new FormControl('',[Validators.required, Validators.minLength(3)])
     });
+
+    this.searchControl = new FormControl('');
   }
 
   ngOnInit(): void {
     this.loadTasks();
+
+    this.searchControl.valueChanges
+    .pipe(
+      debounceTime(100),
+      distinctUntilChanged()
+    ).subscribe(value => this.filterTasks(value))
   }
 
   loadTasks(): void {
     this.taskService.getTasks().subscribe(
-      (tasks) => this.tasks = tasks,
+      (tasks) => 
+        {
+          this.tasks = tasks
+          this.filteredTasks = [];
+        },
       (error) => console.error('Error fetching tasks:', error)
     );
   }
@@ -65,6 +80,18 @@ export class TasksComponent implements OnInit {
 
   deleteTask(id: number): void {
     this.taskService.deleteTask(id).subscribe(() => this.loadTasks());
+  }
+
+  filterTasks(searchTerm: string): void {
+    const term = searchTerm.toLowerCase();
+
+    if (term === '') {
+      this.filteredTasks = [];
+      return;
+    }
+    this.filteredTasks = this.tasks.filter(task =>
+      task.title.toLowerCase().includes(term)
+    )
   }
 }
 
