@@ -73,4 +73,33 @@ class TaskController extends AbstractController
             'completed' => $task->getCompleted()
         ]);
     }
+
+
+    #[Route('', name: 'complete_all_tasks', methods: ['PUT'])]
+    public function completeAllTasks(EntityManagerInterface $em): JsonResponse
+    {
+        // Buscamos todas las tareas
+        $tasks = $em->getRepository(Task::class)->findAll();
+        
+        if (empty($tasks)) {
+            return $this->json(['error' => 'Tasks not found'], 404);
+        }
+    
+        // Marcamos las tareas como completadas
+        foreach ($tasks as $task) {
+            $task->setCompleted(true);  // Nota: usa booleano true, no string "true"
+        }
+    
+        // Guardar los cambios en bbdd
+        $em->flush();
+        
+        // Devolvemos respuesta
+        $data = array_map(fn($task) => [
+            'id' => $task->getId(),
+            'title' => $task->getTitle(),
+            'completed' => $task->getCompleted()
+        ], $tasks);
+    
+        return $this->json($data);
+    }
 }
