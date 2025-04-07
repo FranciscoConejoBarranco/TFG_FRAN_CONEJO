@@ -1,0 +1,9 @@
+/* Animación del loader (puedes añadir esto si lo necesitas) */
+@keyframes progress {
+    0% {
+        width: 100%;
+    }
+    100% {
+        width: 0%;
+    }
+}
