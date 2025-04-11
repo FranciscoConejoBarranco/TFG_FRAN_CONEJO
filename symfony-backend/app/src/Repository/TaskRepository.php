@@ -16,28 +16,30 @@ class TaskRepository extends ServiceEntityRepository
         parent::__construct($registry, Task::class);
     }
 
-    //    /**
-    //     * @return Task[] Returns an array of Task objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('t')
-    //            ->andWhere('t.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('t.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    public function findAllOrdered(string $order = 'ASC')
+    {
+        // Validación estricta del parámetro
+        $order = strtoupper($order) === 'DESC' ? 'DESC' : 'ASC';
 
-    //    public function findOneBySomeField($value): ?Task
-    //    {
-    //        return $this->createQueryBuilder('t')
-    //            ->andWhere('t.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+
+        return $this->createQueryBuilder('t')
+            ->orderBy('t.id', $order)
+            ->getQuery()
+            ->getResult();
+    }
+
+
+    public function createAtOrdered(string $order = 'ASC')
+    {
+        // Validación estricta del parámetro
+        $order = strtoupper($order) === 'DESC' ? 'DESC' : 'ASC';
+
+
+        return $this->createQueryBuilder('t')
+            ->orderBy('t.createdAt', $order)
+            ->getQuery()
+            ->getResult();
+    }
+
+
 }

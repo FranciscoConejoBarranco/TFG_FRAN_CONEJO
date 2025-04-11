@@ -1,5 +1,5 @@
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TaskService } from '../../shared/services/task-service.service';
 import { Task } from '../../shared/interfaces/task';
@@ -11,6 +11,9 @@ import {
   Validators,
 } from '@angular/forms';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
+import { ToastComponent } from '../../shared/component/toast/toast.component';
+import { ToasterService } from '../../shared/services/toaster.service';
+import { Toast } from '../../shared/interfaces/toast';
 
 
 @Component({
@@ -26,6 +29,8 @@ export class TasksComponent implements OnInit {
   taskForm: FormGroup;
   filteredTasks: Task[] = [];
   searchControl: FormControl;
+
+  private toastService = inject(ToasterService)
 
   constructor(private taskService: TaskService) {
     this.taskForm = new FormGroup({
@@ -62,7 +67,8 @@ export class TasksComponent implements OnInit {
     const newTask: Task = {
        id: 0, 
        title: this.taskForm.value.title, 
-       completed: false 
+       completed: false,
+       createdAt: new Date().toISOString()
       };
 
     this.taskService.addTask(newTask).subscribe(() => 
@@ -93,6 +99,36 @@ export class TasksComponent implements OnInit {
       task.title.toLowerCase().includes(term)
     )
   }
+
+  currentOrder: 'ASC' | 'DESC' | null = null;
+
+  orderByCreatedAt(order: 'ASC'|'DESC'): void {
+    this.currentOrder = order;
+    this.taskService.getTaskByCreatedDate(order).subscribe(
+      (tasks) => {
+      this.tasks = tasks;
+      this.filteredTasks = [];
+    })
+  }
+
+
+  showToastSuccess() {
+    this.toastService.success('Perfecto', 'esto es un mensaje success')
+  }
+
+  showToastError() {
+    this.toastService.error('Error', 'esto es un mensaje de error')
+  }
+
+  onSubmit(): void {
+    if (this.taskForm.valid) {
+      this.addTask();
+      this.showToastSuccess();
+    } else {
+      this.taskForm.markAllAsTouched(); // Muestra los errores si el usuario intenta enviar sin completar bien
+    }
+  }
+  
 }
 
 

@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\TaskRepository;
+use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: TaskRepository::class)]
@@ -16,8 +17,22 @@ class Task
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $title = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $completed = null;
+    #[ORM\Column(type: 'boolean', nullable: true)]
+    private ?bool $completed = null;
+
+    #[ORM\Column(type: 'datetime_immutable')]
+    private \DateTimeImmutable $createdAt; // Elimina el "?" para forzar inicialización
+
+    public function __construct()
+    {
+        $this->createdAt = new \DateTimeImmutable(); // Inicialización garantizada
+    }
+
+    public function getCreatedAt(): \DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
 
     public function getId(): ?int
     {
@@ -36,15 +51,20 @@ class Task
         return $this;
     }
 
-    public function getCompleted(): ?string
+    public function isCompleted(): ?bool
     {
         return $this->completed;
     }
 
-    public function setCompleted(?string $completed): static
+    public function setCompleted(?bool $completed): static
     {
         $this->completed = $completed;
 
         return $this;
     }
+
+   
+
+
+  
 }
