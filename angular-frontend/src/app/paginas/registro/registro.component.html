@@ -1,0 +1,158 @@
+<div class="relative">
+    <!-- Hero section con imagen de fondo de libros modernos -->
+    <div class="relative h-80 bg-cover bg-center">
+      <!-- Overlay con gradiente moderno -->
+      <div class="absolute inset-0 bg-gradient-to-r from-indigo-900 to-purple-700 opacity-85"></div>
+      
+      <div class="container mx-auto px-4 h-full">
+        <div class="flex items-center justify-center h-full relative z-10">
+          <div class="text-center">
+            <h1 class="text-5xl font-bold text-white mb-2">Bubooks</h1>
+            <h2 class="text-3xl font-light text-white">Registro</h2>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Área de formulario con diseño moderno -->
+    <div class="bg-gradient-to-b from-gray-50 to-white py-16">
+      <div class="container mx-auto px-4">
+        <div class="max-w-2xl mx-auto">
+          <div class="text-center mb-10">
+            <h3 class="text-2xl font-semibold text-indigo-900">Únete a nuestra comunidad literaria</h3>
+            <p class="text-gray-600 mt-2">Regístrate para compartir tus reseñas y descubrir nuevos libros</p>
+          </div>
+  
+          <div class="bg-white rounded-xl shadow-xl p-8 border-t-4 border-indigo-600">
+            <form name="form" id="form" (submit)="enviar()" #formulario="ngForm">
+              <div class="space-y-6">
+                <!-- Campo Nombre -->
+                <div>
+                  <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
+                  <input
+                    type="text"
+                    id="name"
+                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200"
+                    name="name"
+                    [(ngModel)]="modelo.name"
+                    #name="ngModel"
+                    placeholder="Tu nombre completo"
+                    required="true"
+                  />
+                  @if(name.invalid && (name.dirty || name.touched)) {
+                  <div class="mt-2 text-sm text-red-600 bg-red-50 p-2 rounded-md">
+                    @if(name.errors) {
+                    <div>El nombre es obligatorio</div>
+                    }
+                  </div>
+                  }
+                </div>
+                
+                <!-- Campo Email -->
+                <div>
+                  <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Correo electrónico</label>
+                  <input
+                    type="email"
+                    id="email"
+                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200"
+                    name="email"
+                    [(ngModel)]="modelo.email"
+                    #email="ngModel"
+                    placeholder="ejemplo@correo.com"
+                    required="true"
+                    pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
+                  />
+                  @if(email.invalid && (email.dirty || email.touched)) {
+                  <div class="mt-2 text-sm text-red-600 bg-red-50 p-2 rounded-md">
+                    @if(email.errors){
+                    <div>Por favor, introduce un correo electrónico válido</div>
+                    }
+                  </div>
+                  }
+                </div>
+                
+                <!-- Campo Contraseña -->
+                <div>
+                  <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Contraseña</label>
+                  <input
+                    type="password"
+                    id="password"
+                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200"
+                    name="password"
+                    [(ngModel)]="modelo.password"
+                    #password="ngModel"
+                    placeholder="Crea una contraseña segura"
+                    required="true"
+                  />
+                  @if(password.invalid && (password.dirty || password.touched)) {
+                  <div class="mt-2 text-sm text-red-600 bg-red-50 p-2 rounded-md">
+                    @if(password.errors){
+                    <div>La contraseña es obligatoria</div>
+                    }
+                  </div>
+                  }
+                </div>
+  
+                <!-- Botones de acción -->
+                @if(boton==0) {
+                <div class="mt-8">
+                  <button
+                    class="w-full px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-all duration-300 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                    type="submit"
+                    title="Registrarse"
+                    [disabled]="!formulario.form.valid"
+                  >
+                    Crear cuenta
+                  </button>
+                  <div class="mt-6 text-center">
+                    <a href="/login" class="text-indigo-600 hover:text-indigo-800 transition-colors duration-300 font-medium">¿Ya tienes una cuenta? Inicia sesión</a>
+                  </div>
+                </div>
+                } @if(boton==1) {
+                <div class="mt-8 text-center">
+                  <div class="flex justify-center">
+                    <!-- <img src="img/img/load.gif" alt="Cargando" class="h-12" /> -->
+                  </div>
+                  <p class="text-gray-600 mt-2">Procesando tu registro...</p>
+                </div>
+                }
+              </div>
+            </form>
+          </div>
+          
+          <!-- Beneficios de registro -->
+          <div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-white p-6 rounded-lg shadow-md text-center">
+              <div class="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                </svg>
+              </div>
+              <h4 class="font-semibold text-gray-800">Reseñas personalizadas</h4>
+              <p class="text-gray-600 text-sm mt-2">Comparte tus opiniones sobre tus lecturas favoritas</p>
+            </div>
+            
+            <div class="bg-white p-6 rounded-lg shadow-md text-center">
+              <div class="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+              </div>
+              <h4 class="font-semibold text-gray-800">Comunidad de lectores</h4>
+              <p class="text-gray-600 text-sm mt-2">Conecta con otros amantes de la literatura</p>
+            </div>
+            
+            <div class="bg-white p-6 rounded-lg shadow-md text-center">
+              <div class="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                </svg>
+              </div>
+              <h4 class="font-semibold text-gray-800">Descubre nuevos libros</h4>
+              <p class="text-gray-600 text-sm mt-2">Recomendaciones basadas en tus gustos</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
