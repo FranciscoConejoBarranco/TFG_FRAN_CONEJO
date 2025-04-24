@@ -60,8 +60,9 @@ final class UserController extends AbstractController
             $jwt = JWT::encode($payload, $_ENV['JWT_SECRET'], 'HS512');
             return $this->json([
                 'id' => $user->getId(),
-                'nombre' => $user->getName(),
+                'name' => $user->getName(),
                 'token' => $jwt
+                
             ]);
         } else {
             return $this->json([
