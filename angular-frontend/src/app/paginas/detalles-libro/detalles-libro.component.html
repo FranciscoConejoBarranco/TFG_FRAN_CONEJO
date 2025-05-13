@@ -1,0 +1,58 @@
+<main class="relative min-h-screen text-white bg-neutral-900">
+  <section class="overflow-hidden relative w-full h-[70vh]">
+    <button
+      class="fixed top-8 left-8 z-10 gap-2 px-6 py-3 rounded-lg cursor-pointer bg-transparent border border-white text-white hover:bg-blue-700 hover:bg-opacity-10 transition-all duration-300"
+      (click)="goToLanding()"
+    >
+      ← Volver
+    </button>
+
+    <img
+      class="object-cover overflow-hidden aspect-square size-full"
+      [src]="selectedBook.coverImage"
+      [alt]="selectedBook.title"
+    />
+
+    <div class="absolute inset-0">
+      <article class="absolute bottom-[10%] left-[5%] max-w-[600px]">
+        <h1 class="mb-4 text-5xl max-sm:text-3xl">
+          {{selectedBook.title}}
+        </h1>
+        <div class="flex gap-4 items-center mb-4">
+          <span class="text-amber-400">
+            <span>★</span>
+            <span>{{selectedBook.rating}}</span>
+          </span>
+          <span>|</span>
+          <span>{{selectedBook.releaseDate}}</span>
+          <span>|</span>
+          <span>
+            <span>{{selectedBook.pages}}</span>
+            <span>páginas</span>
+          </span>
+        </div>
+        <p class="mb-8 text-lg leading-relaxed max-sm:text-base">
+          {{selectedBook.description}}
+        </p>
+        <div class="flex gap-4">
+          <button
+            class="px-8 py-3 text-lg bg-blue-600 rounded-lg cursor-pointer border-[none] text-[white] hover:bg-blue-700"
+          >
+            Leer ahora
+          </button>
+          <button
+            class="px-8 py-3 text-lg rounded-lg cursor-pointer bg-transparent border border-white text-white hover:bg-blue-700 hover:bg-opacity-20 transition-all duration-300"
+          >
+            + Mi lista
+          </button>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <app-libros-relacionados
+    [relatedBooks]="relatedBooks"
+  ></app-libros-relacionados>
+
+  <app-review></app-review>
+</main>

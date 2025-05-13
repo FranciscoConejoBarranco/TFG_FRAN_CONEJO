@@ -1,0 +1,15 @@
+<div class="relative mx-auto my-0 max-w-[600px]">
+    <input
+      class="builder-758a951b5b934c0d89926b9c18dabb24 py-6 pr-16 pl-8 w-full text-xl transition-all bg-white bg-opacity-90 border-[none] duration-[0.3s] ease-[ease] rounded-[50px] shadow-[0_4px_20px_rgba(0,0,0,0.2)] text-zinc-800 max-sm:py-5 max-sm:pr-14 max-sm:pl-6 max-sm:w-full max-sm:text-base max-sm:rounded-[30px] max-sm:shadow-[0_3px_15px_rgba(0,0,0,0.2)]"
+      type="text"
+      placeholder="¿Qué tipo de historia buscas hoy?"
+      [value]="searchQuery"
+      (input)="updateSearch($event)"
+    />
+    <div class="builder-dae7109a36b04901a54e3ce96746d442 absolute right-4 top-2/4 p-2 bg-blue-600 rounded-full transition-all -translate-y-2/4 cursor-pointer duration-[0.3s] ease-[ease] z-[1] max-sm:p-1.5 max-sm:right-[0.8rem]">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+    </div>
+</div>

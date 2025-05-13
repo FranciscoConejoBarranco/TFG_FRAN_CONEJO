@@ -1,0 +1,20 @@
+<section class="px-5 py-16 bg-neutral-900">
+    <h2 class="mb-8 text-3xl">Libros relacionados</h2>
+    <div
+      class="flex overflow-x-auto gap-8 px-0 py-4 [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-track]:bg-neutral-800 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-thumb]:bg-neutral-600 [&::-webkit-scrollbar-thumb]:rounded-full"
+    >
+      <a
+        *ngFor="let book of relatedBooks; trackBy: trackByBook"
+        [href]="'/book/' + book.id"
+        class="no-underline transition-transform duration-300 ease-in-out min-w-[200px] text-inherit hover:scale-105"
+      >
+        <img
+          class="object-cover overflow-hidden mb-4 w-full rounded-lg aspect-square h-[300px]"
+          [src]="book.coverImage"
+          [alt]="book.title"
+        />
+        <h3 class="mb-2 text-lg">{{book.title}}</h3>
+        <p class="text-sm text-neutral-400">{{book.author}}</p>
+      </a>
+    </div>
+  </section>

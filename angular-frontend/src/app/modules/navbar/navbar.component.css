@@ -1,0 +1,133 @@
+/* Estilos generales del navbar */
+.navbar {
+  background-color: #ffffff;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+}
+
+.navbar-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  height: 70px;
+}
+
+/* Logo */
+.navbar-logo a {
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+  text-decoration: none;
+}
+
+/* Menú de navegación */
+.navbar-menu {
+  display: flex;
+  align-items: center;
+}
+
+.navbar-links {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.navbar-links li {
+  margin: 0 15px;
+}
+
+.navbar-links a {
+  color: #555;
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.navbar-links a:hover, 
+.navbar-links a.active {
+  color: #007bff;
+}
+
+/* Botón de menú hamburguesa (solo visible en móvil) */
+.menu-toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 30px;
+  height: 21px;
+  cursor: pointer;
+}
+
+.bar {
+  height: 3px;
+  width: 100%;
+  background-color: #333;
+  border-radius: 10px;
+  transition: all 0.3s ease-in-out;
+}
+
+/* Media queries para responsividad */
+@media (max-width: 768px) {
+  .menu-toggle {
+    display: flex;
+  }
+  
+  .navbar-menu {
+    position: absolute;
+    top: 70px;
+    left: 0;
+    width: 100%;
+    background-color: #ffffff;
+    flex-direction: column;
+    align-items: flex-start;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-in-out, box-shadow 0.3s ease;
+    box-shadow: none;
+  }
+  
+  .navbar-menu.active {
+    max-height: 300px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .navbar-links {
+    flex-direction: column;
+    width: 100%;
+    padding: 10px 0;
+  }
+  
+  .navbar-links li {
+    margin: 0;
+    width: 100%;
+    text-align: center;
+  }
+  
+  .navbar-links a {
+    display: block;
+    padding: 15px;
+    width: 100%;
+  }
+  
+  /* Animación del menú hamburguesa */
+  .active .bar:nth-child(1) {
+    transform: translateY(9px) rotate(45deg);
+  }
+  
+  .active .bar:nth-child(2) {
+    opacity: 0;
+  }
+  
+  .active .bar:nth-child(3) {
+    transform: translateY(-9px) rotate(-45deg);
+  }
+}

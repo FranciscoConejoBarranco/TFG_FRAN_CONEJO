@@ -1,0 +1,60 @@
+<div class="min-h-screen text-white bg-black">
+    <app-navbar></app-navbar>
+  
+    <div class="flex relative justify-center items-center px-5 py-0 h-screen text-center">
+      <img
+        src="https://images.pexels.com/photos/6334875/pexels-photo-6334875.jpeg"
+        class="object-cover overflow-hidden absolute top-0 left-0 aspect-square blur-[2px] brightness-[0.3] size-full"
+      />
+      <div class="relative p-12 w-full rounded-3xl backdrop-blur-[10px] max-w-[900px] max-sm:px-4 max-sm:py-8">
+        <h1 class="mb-4 text-6xl font-bold max-sm:text-4xl">
+          Encuentra tu próximo libro favorito con BUBOOKS
+        </h1>
+        <p class="mb-10 text-2xl text-neutral-200 max-sm:text-lg">
+          Descubre historias que te atraparán desde la primera página
+        </p>
+        <app-search-bar
+          [categories]="categories"
+          [books]="books"
+          (search)="onSearch($event)"
+          (categorySelected)="onCategorySelected($event)"
+        ></app-search-bar>
+      </div>
+    </div>
+  
+    <div class="px-5 py-10">
+      <ng-container *ngFor="let category of categories; trackBy: trackByCategory">
+        <div class="mb-10 max-sm:mb-8">
+          <h2 class="mb-5 text-3xl max-sm:pl-1.5 max-sm:mb-4 max-sm:text-2xl">
+            {{category.name}}
+          </h2>
+          <div class="builder-1fab72ca61854613a0a8fa9e4f3c19f0 grid overflow-x-auto grid-flow-col gap-5 px-0 py-2.5 auto-cols-[200px] scroll-px-5 scroll-py-0 max-sm:gap-3 max-sm:px-0 max-sm:py-1.5 max-sm:mr-0 max-sm:auto-cols-[140px]">
+            <ng-container *ngFor="let book of category.books; trackBy: trackByBook">
+              <div class="builder-5399104d0fe14e05b9b5579e4ef7ad19 relative transition-transform cursor-pointer duration-[0.2s] min-w-[200px] snap-start max-sm:min-w-[140px]">
+                <img
+                  class="object-cover overflow-hidden mb-2 w-full rounded-lg aspect-square"
+                  [src]="book.image"
+                />
+                <div class="p-2">
+                  <div class="overflow-hidden mb-1 text-sm font-medium whitespace-nowrap text-ellipsis">
+                    {{book.title}}
+                  </div>
+                  <div class="flex gap-1 items-center text-yellow-400">
+                    <span>{{('★').repeat(Math.floor(book.rating))}}</span>
+                    <ng-container *ngIf="book.rating % 1 !== 0">
+                      <span>½</span>
+                    </ng-container>
+                    <span class="ml-1 text-xs text-stone-500">
+                      {{book.rating}}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </ng-container>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+  
+    <app-footer></app-footer>
+  </div>

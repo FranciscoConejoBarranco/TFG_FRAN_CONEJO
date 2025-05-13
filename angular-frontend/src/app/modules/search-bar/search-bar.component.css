@@ -1,0 +1,13 @@
+.builder-758a951b5b934c0d89926b9c18dabb24::placeholder {
+    color: #666;
+  }
+  .builder-758a951b5b934c0d89926b9c18dabb24:focus {
+    outline: none;
+    background-color: #fff;
+    box-shadow: 0 4px 25px rgba(0, 102, 255, 0.25);
+    transform: translateY(-2px);
+  }
+  .builder-dae7109a36b04901a54e3ce96746d442:hover {
+    background-color: #0052cc;
+    transform: translateY(-50%) scale(1.1);
+  }

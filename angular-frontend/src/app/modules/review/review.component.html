@@ -1,0 +1,38 @@
+<!-- Sección de Reseñas -->
+<section class="px-5 py-16 border-t border-solid bg-neutral-900 border-t-white border-opacity-10">
+  <div class="flex justify-between items-center mb-8">
+    <h2 class="text-3xl">Reseñas</h2>
+    <button
+      class="px-8 py-3 text-base bg-blue-600 rounded-lg cursor-pointer border-[none] text-[white] hover:bg-blue-700"
+      (click)="escribirResena()"
+    >
+      Escribir reseña
+    </button>
+  </div>
+
+  <div class="flex gap-8 mb-12 max-sm:flex-col">
+    <div class="text-center flex-[0_0_200px]">
+      <div class="text-6xl text-amber-400 font-bold">{{averageRating}}</div>
+      <div class="mb-2 text-2xl text-amber-400">{{getStars(+averageRating)}}</div>
+      <div class="text-neutral-400">Basado en {{totalReviews}} reseñas</div>
+    </div>
+
+    <div class="flex-1">
+      <article
+        *ngFor="let review of reviews"
+        class="px-0 py-6 border-b border-solid border-b-white border-opacity-10"
+      >
+        <div class="flex gap-4 items-center mb-4">
+          <div>
+            <h3 class="font-bold">{{review.user}}</h3>
+            <div class="flex gap-2 items-center">
+              <span class="text-amber-400">{{getStars(review.rating)}}</span>
+              <time class="text-sm text-neutral-400">{{review.date}}</time>
+            </div>
+          </div>
+        </div>
+        <p class="leading-relaxed">{{review.comment}}</p>
+      </article>
+    </div>
+  </div>
+</section>
