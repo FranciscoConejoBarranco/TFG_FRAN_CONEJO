@@ -104,7 +104,7 @@ final class UserController extends AbstractController
             ->from(new Address('test@test.com', 'Test'))
             ->to($dto->email)
             ->subject('Verificación de cuenta')
-            ->html('<h1>Verificación de contraseña</h1>
+            ->html('<h1>Verificación de cuenta</h1>
         Hola ' . $dto->name . ', por favor verifica tu cuenta haciendo click en el siguiente enlace: <a href="' . $url . '">Verificar cuenta</a></p>
         <p>Si no fuiste tú, ignora este mensaje</p>');
         try {
