@@ -1,0 +1,113 @@
+<!-- BOTÓN HAMBURGUESA -->
+<button
+  aria-label="Toggle menu"
+  class="fixed top-5 right-8 z-50 p-2.5 cursor-pointer border-none sm:hidden"
+  [attr.aria-expanded]="isMenuOpen"
+  (click)="toggleMenu()"
+  (keydown)="handleKeydown($event)"
+>
+  <div
+    class="my-1.5 h-[3px] w-[25px] bg-white transition-all"
+    [ngStyle]="{
+      transform: isMenuOpen ? 'rotate(45deg) translateY(8px)' : 'none'
+    }"
+  ></div>
+  <div
+    class="my-1.5 h-[3px] w-[25px] bg-white transition-all"
+    [ngStyle]="{ opacity: isMenuOpen ? '0' : '1' }"
+  ></div>
+  <div
+    class="my-1.5 h-[3px] w-[25px] bg-white transition-all"
+    [ngStyle]="{
+      transform: isMenuOpen ? 'rotate(-45deg) translateY(-8px)' : 'none'
+    }"
+  ></div>
+</button>
+
+<nav
+  role="navigation"
+  aria-label="Main menu"
+  class="fixed top-0 left-0 h-full w-[250px] bg-neutral-900/70 backdrop-blur-md shadow-xl transition-transform duration-300 ease-in-out z-40 sm:translate-x-0"
+  [class.-translate-x-full]="!isMenuOpen"
+>
+  <li class="p-4 space-y-2">
+    <a
+      href="/home"
+      class="block px-4 py-3 rounded-lg text-white hover:bg-white/10 transition-all duration-200"
+      >Inicio</a
+    >
+  </li>
+
+  <!-- SUPERADMIN -->
+  <ul *ngIf="role === 'SUPERADMIN'" class="p-4 space-y-2">
+    <li>
+      <a
+        href="/dashboardadmin"
+        class="block px-4 py-3 rounded-lg text-white hover:bg-white/10 transition-all duration-200"
+        >Dashboard</a
+      >
+    </li>
+    <li>
+      <a
+        href="/gestionlibros"
+        class="block px-4 py-3 rounded-lg text-white hover:bg-white/10 transition-all duration-200"
+        >Gestión de Libros</a
+      >
+    </li>
+    <li>
+      <a
+        href="/gestionusuarios"
+        class="block px-4 py-3 rounded-lg text-white hover:bg-white/10 transition-all duration-200"
+        >Gestión de Usuarios</a
+      >
+    </li>
+    <li>
+      <a
+        href="/gestionreviews"
+        class="block px-4 py-3 rounded-lg text-white hover:bg-white/10 transition-all duration-200"
+        >Gestión de Reseñas</a
+      >
+    </li>
+  </ul>
+
+  <!-- USER -->
+  <ul *ngIf="role === 'USER'" class="p-4 space-y-2">
+    <li>
+      <a
+        href="/dashboardusuario"
+        class="block px-4 py-3 rounded-lg text-white hover:bg-white/10 transition-all duration-200"
+        >Dashboard</a
+      >
+    </li>
+    <li>
+      <a
+        href="/perfil"
+        class="block px-4 py-3 rounded-lg text-white hover:bg-white/10 transition-all duration-200"
+        >Perfil</a
+      >
+    </li>
+    <li>
+      <a
+        href="/mislistas"
+        class="block px-4 py-3 rounded-lg text-white hover:bg-white/10 transition-all duration-200"
+        >Mis listas</a
+      >
+    </li>
+    <li>
+      <a
+        href="/reviews"
+        class="block px-4 py-3 rounded-lg text-white hover:bg-white/10 transition-all duration-200"
+        >Reseñas</a
+      >
+    </li>
+    <li>
+      <a
+        href="/recomendados"
+        class="block px-4 py-3 rounded-lg text-white hover:bg-white/10 transition-all duration-200"
+        >Recomendados</a
+      >
+    </li>
+  </ul>
+</nav>
+
+

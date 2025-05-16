@@ -1,0 +1,23 @@
+<app-navbar-dashboard />
+
+<div class="bg-black min-h-screen text-white overflow-x-hidden max-w-screen px-4 py-10 sm:pl-72">
+  <h1 class="text-3xl font-semibold mb-8">Mis Listas</h1>
+
+  <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+    <div
+      *ngFor="let lista of listas"
+      class="bg-[#1c1c1c] rounded-xl p-5 flex flex-col justify-between shadow-md hover:scale-[1.02] transition-transform"
+    >
+      <div>
+        <h2 class="text-xl font-bold mb-2">{{ lista.nombre }}</h2>
+        <p class="text-gray-400 mb-4">{{ lista.descripcion }}</p>
+        <p class="text-sm text-gray-500">Libros: {{ lista.cantidad }}</p>
+      </div>
+      <button
+        class="mt-4 bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition"
+      >
+        Ver lista
+      </button>
+    </div>
+  </div>
+</div>

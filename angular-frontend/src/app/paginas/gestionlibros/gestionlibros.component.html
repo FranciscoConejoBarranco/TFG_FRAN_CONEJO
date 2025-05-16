@@ -1,0 +1,33 @@
+<app-navbar-dashboard />
+
+<!-- Contenedor principal -->
+<div class="bg-black min-h-screen text-white overflow-x-hidden max-w-screen px-4 py-10 sm:pl-72">
+    <h2 class="text-lg sm:text-xl font-semibold mb-5">Gestión de Libros</h2>
+
+  <div class="overflow-x-auto">
+    <table class="w-full text-sm sm:text-base table-auto border-separate border-spacing-y-3">
+      <thead>
+        <tr class="text-left text-gray-300">
+          <th class="px-4">Título</th>
+          <th class="px-4">Autor</th>
+          <th class="px-4">Stock</th>
+          <th class="px-4">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          *ngFor="let libro of libros"
+          class="bg-neutral-800 rounded-lg shadow-sm"
+        >
+          <td class="px-4 py-3 rounded-l-lg">{{ libro.title }}</td>
+          <td class="px-4 py-3">{{ libro.autor }}</td>
+          <td class="px-4 py-3">{{ libro.stock }}</td>
+          <td class="px-4 py-3 rounded-r-lg space-x-2">
+            <button class="bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded-md text-sm">Editar</button>
+            <button class="bg-red-600 hover:bg-red-700 px-3 py-1 rounded-md text-sm">Eliminar</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -1,0 +1,44 @@
+<app-navbar-dashboard />
+
+<div class="bg-black min-h-screen text-white overflow-x-hidden max-w-screen">
+  <main class="flex-1 p-6 sm:ml-64 max-sm:ml-0 sm:p-10">
+    <h1 class="text-3xl font-semibold mb-10">Panel de Administración</h1>
+
+    <section
+      class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
+    >
+      <!-- Card: Libros -->
+      <div class="bg-[#1c1c1c] rounded-xl p-6 shadow-md flex flex-col justify-between">
+        <div>
+          <div class="text-4xl mb-4">📚</div>
+          <h2 class="text-xl font-bold mb-2">Gestión de Libros</h2>
+          <p class="text-gray-400 mb-4">Añadir, editar o eliminar libros del catálogo.</p>
+        </div>
+        <a href="/admin/books" class="inline-block bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition">Entrar</a>
+      </div>
+
+      <!-- Card: Usuarios -->
+      <div class="bg-[#1c1c1c] rounded-xl p-6 shadow-md flex flex-col justify-between">
+        <div>
+          <div class="text-4xl mb-4">👥</div>
+          <h2 class="text-xl font-bold mb-2">Gestión de Usuarios</h2>
+          <p class="text-gray-400 mb-4">Ver, editar o eliminar usuarios registrados.</p>
+        </div>
+        <a href="/admin/users" class="inline-block bg-yellow-600 text-white py-2 px-4 rounded hover:bg-yellow-700 transition">Entrar</a>
+      </div>
+
+      <!-- Card: Reseñas -->
+      <div class="bg-[#1c1c1c] rounded-xl p-6 shadow-md flex flex-col justify-between">
+        <div>
+          <div class="text-4xl mb-4">📝</div>
+          <h2 class="text-xl font-bold mb-2">Gestión de Reseñas</h2>
+          <p class="text-gray-400 mb-4">Moderar o eliminar reseñas de libros.</p>
+        </div>
+        <a href="/admin/reviews" class="inline-block bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700 transition">Entrar</a>
+      </div>
+    </section>
+    <app-footer/>
+  </main>
+</div>
+
+

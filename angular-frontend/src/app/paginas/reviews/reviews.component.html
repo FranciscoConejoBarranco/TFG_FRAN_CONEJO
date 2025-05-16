@@ -1,0 +1,17 @@
+<app-navbar-dashboard />
+
+<div class="bg-black min-h-screen text-white overflow-x-hidden max-w-screen px-4 py-10 sm:pl-72">
+  <h1 class="text-3xl font-semibold mb-8">Mis Reseñas</h1>
+
+  <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+    <div
+      *ngFor="let resena of resenas"
+      class="bg-[#1c1c1c] rounded-xl p-5 shadow-md hover:scale-[1.02] transition-transform"
+    >
+      <h2 class="text-lg font-bold mb-2">{{ resena.tituloLibro }}</h2>
+      <p class="text-gray-400 text-sm mb-2">Puntuación: {{ resena.puntuacion }}/5</p>
+      <p class="text-gray-300 text-sm italic mb-4">“{{ resena.comentario }}”</p>
+      <p class="text-xs text-gray-500 text-right">Publicado el {{ resena.fecha }}</p>
+    </div>
+  </div>
+</div>
