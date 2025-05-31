@@ -45,7 +45,8 @@ security:
         # - { path: ^/api/clients/create, roles: ROLE_SUPERADMIN } # 👑 Zona protegida solo para superadmins
         # - { path: ^/api/clients/\d+$, roles: ROLE_SUPERADMIN } # Permitir editar cliente por ID
         - { path: ^/auth/me, roles: PUBLIC_ACCESS }   # ✅ Solo usuarios autenticados pueden consultar /me
-        - { path: ^/auth/logout, roles: PUBLIC_ACCESS} # ✅ Logout requiere autenticación
+        - { path: ^/auth/logout, roles: PUBLIC_ACCESS}
+        - { path: ^/importar-libros, roles: PUBLIC_ACCESS} # ✅ Logout requiere autenticación
 
 when@test:
     security:
