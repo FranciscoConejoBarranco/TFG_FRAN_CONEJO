@@ -78,7 +78,7 @@ final class UserController extends AbstractController
             ]);
 
             $cookie = new Cookie(
-                name: 'codearts_token',
+                name: 'X-AUTH-TOKEN',
                 value: $jwt,
                 expire: new \DateTimeImmutable('+1 day'),
                 path: '/',
@@ -101,7 +101,7 @@ final class UserController extends AbstractController
     #[Route('/auth/me', methods: ['get'])]
     public function me(Request $request): JsonResponse
     {
-        $jwt = $request->cookies->get('codearts_token');
+        $jwt = $request->cookies->get('X-AUTH-TOKEN');
 
         if (!$jwt) {
             return $this->json(['error' => 'No autenticado'], 401);
@@ -124,7 +124,7 @@ final class UserController extends AbstractController
     public function logout(Request $request): JsonResponse
     {
         $response = new JsonResponse(['message' => 'Logout exitoso']);
-        $response->headers->clearCookie('codearts_token');
+        $response->headers->clearCookie('X-AUTH-TOKEN');
         return $response;
     }
 
@@ -163,7 +163,7 @@ final class UserController extends AbstractController
         $entity->setName($dto->name);
         $entity->setEmail($dto->email);
         $entity->setPassword($passwordHaser->hashPassword($entity, $dto->password));
-        $entity->setRoles($dto->roles);
+        $entity->setRoles(['ROLE_USER']); // Asignar rol por defecto
         $entity->setEstado($estado); // Asigna el estado encontrado o creado
         $entity->setToken($token);
 
@@ -179,7 +179,7 @@ final class UserController extends AbstractController
             ->html('<html style="font-family: Arial, sans-serif; background-color: #f4f7fc; color: #333;">
                 <body style="margin: 0; padding: 20px; background-color: #f4f7fc;">
                 <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 30px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);">
-                <h1 style="font-size: 24px; color: #003366; text-align: center;">¡Bienvenido a CodeArts!</h1>
+                <h1 style="font-size: 24px; color: #003366; text-align: center;">¡Bienvenido a BuBooks!</h1>
                 <p style="font-size: 16px; color: #333333;">Hola, ' . $dto->name . ':</p>
                 <p style="font-size: 16px; color: #333333;">Te has registrado exitosamente. Para activar tu cuenta, por favor haz clic en el siguiente enlace:</p>
                 <p style="text-align: center;">
@@ -190,7 +190,7 @@ final class UserController extends AbstractController
                     <code style="background-color: #f1f1f1; padding: 5px 10px; font-size: 14px; color: #003366; border-radius: 5px; margin-top: 2px;">' . $url . '</code>
                 </p>
                 <br/>
-                <p style="font-size: 16px; color: #333333;">Gracias por unirte a CodeArts. ¡Estamos emocionados de tenerte con nosotros!</p>
+                <p style="font-size: 16px; color: #333333;">Gracias por unirte a BuBooks. ¡Estamos emocionados de tenerte con nosotros!</p>
                 </div>
                 </body>
                 </html>');

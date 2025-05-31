@@ -8,6 +8,9 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Doctrine\Common\Collections\Collection;
 
+// Ensure the Doctrine ORM Mapping namespace is imported
+use Doctrine\ORM\Mapping\Entity;
+
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
@@ -43,15 +46,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\JoinColumn(nullable: false)]
     private ?Estado $estado = null;
 
-
-    #[ORM\OneToMany(mappedBy: 'gestor', targetEntity: Client::class)]
-    private Collection $clientes;
-
-
-    public function __construct()
-    {
-        $this->clientes = new \Doctrine\Common\Collections\ArrayCollection();
-    }
 
 
     public function getId(): ?int
@@ -181,28 +175,5 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->roles;
     }
 
-    public function getClientes(): Collection
-    {
-        return $this->clientes;
-    }
 
-    public function addCliente(Client $cliente): static
-    {
-        if (!$this->clientes->contains($cliente)) {
-            $this->clientes[] = $cliente;
-            $cliente->setGestor(in_array('ROLE_GESTOR', $this->roles) ? $this : null);
-        }
-
-        return $this;
-    }
-    public function removeCliente(Client $cliente): static
-    {
-        if ($this->clientes->removeElement($cliente)) {
-            if ($cliente->getGestor() === $this) {
-                $cliente->setGestor(null);
-            }
-        }
-
-        return $this;
-    }
 }
