@@ -4,21 +4,91 @@
     <div class="navbar-logo">
       <a routerLink="/">BUBOOKS</a>
     </div>
-    
+
     <!-- Hamburger menu para móviles -->
     <div class="menu-toggle" (click)="toggleMenu()">
       <span class="bar"></span>
       <span class="bar"></span>
       <span class="bar"></span>
     </div>
-    
+
     <!-- Menú de navegación -->
-    <div class="navbar-menu" [ngClass]="{'active': isMenuOpen}">
+    <div class="navbar-menu" [ngClass]="{ active: isMenuOpen }">
       <ul class="navbar-links">
-        <li><a routerLink="/libros" routerLinkActive="active" (click)="isMenuOpen = false">Libros</a></li>
-        <li><a routerLink="/resenas" routerLinkActive="active" (click)="isMenuOpen = false">Reseñas</a></li>
-        <li><a routerLink="/registrarse" routerLinkActive="active" (click)="isMenuOpen = false">Registrarse</a></li>
-        <li><a routerLink="/login" routerLinkActive="active" (click)="isMenuOpen = false">Iniciar sesión</a></li>
+        <ng-container
+          *ngIf="!role.includes('ROLE_SUPERADMIN') && !role.includes('ROLE_USER')"
+        >
+          <li>
+            <a
+              routerLink="/registro"
+              routerLinkActive="active"
+              (click)="isMenuOpen = false"
+              >Registrarse</a
+            >
+          </li>
+          <li>
+            <a
+              routerLink="/login"
+              routerLinkActive="active"
+              (click)="isMenuOpen = false"
+              >Iniciar sesión</a
+            >
+          </li>
+        </ng-container>
+
+        <ng-container *ngIf="role.includes('ROLE_SUPERADMIN')">
+          <li>
+            <a
+              routerLink="/dashboardadmin"
+              routerLinkActive="active"
+              (click)="isMenuOpen = false"
+              >Mi Dashboard</a
+            >
+          </li>
+          <li>
+            <a
+              routerLink="/libros"
+              routerLinkActive="active"
+              (click)="isMenuOpen = false"
+              >Libros</a
+            >
+          </li>
+          <li>
+            <a
+              routerLink="/resenas"
+              routerLinkActive="active"
+              (click)="isMenuOpen = false"
+              >Reseñas</a
+            >
+          </li>
+        </ng-container>
+
+        <ng-container *ngIf="role.includes('ROLE_USER')">
+          <li>
+            <a
+              routerLink="/dashboardusuario"
+              routerLinkActive="active"
+              (click)="isMenuOpen = false"
+              >Mi Dashboard</a
+            >
+          </li>
+          <li>
+            <a
+              routerLink="/libros"
+              routerLinkActive="active"
+              (click)="isMenuOpen = false"
+              >Libros</a
+            >
+          </li>
+          <li>
+            <a
+              routerLink="/resenas"
+              routerLinkActive="active"
+              (click)="isMenuOpen = false"
+              >Reseñas</a
+            >
+          </li>
+        </ng-container>
       </ul>
     </div>
   </div>

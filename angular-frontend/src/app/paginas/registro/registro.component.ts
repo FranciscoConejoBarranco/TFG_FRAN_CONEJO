@@ -25,25 +25,27 @@ export class RegistroComponent {
     this.boton=0;
   }
 
-  enviar()
-  {
-    this.boton=1;
-    this.registroService.sendData({ name:this.modelo.name, email:this.modelo.email, password:this.modelo.password }).subscribe(
-      {
-        next:data=>
-          {
-            alert("Te has registrado exitosamente\nHemos enviado un email para activar su cuenta");
-            setInterval(() => {
-              window.location.href="/registro";
-            }, 2000);
-          },error:error=>
-          {
-            alert("ocurrió un error inesperado");
-            window.location.href="/registro";
-            console.log(error);
-          }
-      });
+  enviar() {
+    this.boton = 1;
+    this.registroService.sendData({
+      name: this.modelo.name,
+      email: this.modelo.email,
+      password: this.modelo.password,
+    }).subscribe({
+      next: data => {
+        alert("Te has registrado exitosamente\nHemos enviado un email para activar su cuenta");
+        setInterval(() => {
+          window.location.href = "/home";
+        }, 2000);
+      },
+      error: error => {
+        alert("Ocurrió un error inesperado");
+        window.location.href = "/registro";
+        console.log(error);
+      }
+    });
   }
+  
 
 
 }

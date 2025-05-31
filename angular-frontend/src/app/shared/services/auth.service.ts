@@ -48,7 +48,7 @@ export class AuthService {
   }
 
   getDecodedToken(): any {
-    const token = this.getCookie('codearts_token');
+    const token = this.getCookie('X-AUTH-TOKEN');
     return token ? jwtDecode(token) : null;
   }
   

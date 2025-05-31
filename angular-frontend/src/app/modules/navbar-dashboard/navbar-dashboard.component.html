@@ -39,7 +39,7 @@
   </li>
 
   <!-- SUPERADMIN -->
-  <ul *ngIf="role === 'SUPERADMIN'" class="p-4 space-y-2">
+  <ul *ngIf="role.includes('ROLE_SUPERADMIN')" class="p-4 space-y-2">
     <li>
       <a
         href="/dashboardadmin"
@@ -68,10 +68,32 @@
         >Gestión de Reseñas</a
       >
     </li>
+    <a
+      class="flex items-center gap-3 px-4 py-3 text-white rounded-lg hover:bg-white/10 transition-colors duration-200 p-4 space-y-2"
+      (click)="logout()"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        class="lucide lucide-log-out"
+      >
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+        <polyline points="16 17 21 12 16 7" />
+        <line x1="21" x2="9" y1="12" y2="12" />
+      </svg>
+      Cerrar sesión
+    </a>
   </ul>
 
   <!-- USER -->
-  <ul *ngIf="role === 'USER'" class="p-4 space-y-2">
+  <ul *ngIf="role.includes('ROLE_USER')" class="p-4 space-y-2">
     <li>
       <a
         href="/dashboardusuario"
@@ -107,7 +129,28 @@
         >Recomendados</a
       >
     </li>
+
+    <a
+      class="flex items-center gap-3 px-4 py-3 text-white rounded-lg hover:bg-white/10 transition-colors duration-200 p-4 space-y-2"
+      (click)="logout()"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        class="lucide lucide-log-out"
+      >
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+        <polyline points="16 17 21 12 16 7" />
+        <line x1="21" x2="9" y1="12" y2="12" />
+      </svg>
+      Cerrar sesión
+    </a>
   </ul>
 </nav>
-
-

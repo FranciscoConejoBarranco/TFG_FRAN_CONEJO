@@ -1,34 +1,20 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { ToastComponent } from './shared/component/toast/toast.component';
-import { BrowserModule } from '@angular/platform-browser';
-import { ToasterService } from './shared/services/toaster.service';
-
+import { CookieService } from 'ngx-cookie-service';
+import { AuthService } from './shared/services/auth.service';
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet,ToastComponent],
+  imports: [RouterOutlet],
+  providers: [CookieService],
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  styleUrl: './app.component.css'
 })
 export class AppComponent {
   title = 'angular-frontend';
 
-  private toastService = inject(ToasterService)
+  constructor(private authService: AuthService) {}
 
-  showToastSuccess() {
-    this.toastService.success('Perfecto', 'esto es un mensaje success')
-  }
-
-  showToastError() {
-    this.toastService.error('Error', 'esto es un mensaje de error')
-  }
-
-  showToastInfo() {
-    this.toastService.info('Info', 'esto es un mensaje de info')
-  }
-
-  showToastWarning() {
-    this.toastService.warning('Warning', 'esto es un mensaje de warning')
-  }
+  // ngOnInit(): void {
+  //   this.authService.fetchUser().subscribe(); // Carga el usuario al iniciar app
+  // }
 }
-
