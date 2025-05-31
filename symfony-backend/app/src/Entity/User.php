@@ -6,6 +6,7 @@ use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Doctrine\Common\Collections\Collection;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
@@ -23,7 +24,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @var list<string> The user roles
      */
-    #[ORM\Column]
+    #[ORM\Column(type: 'json')]
     private array $roles = [];
 
     /**
@@ -37,6 +38,21 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 100, nullable: true)]
     private ?string $token = null;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Estado $estado = null;
+
+
+    #[ORM\OneToMany(mappedBy: 'gestor', targetEntity: Client::class)]
+    private Collection $clientes;
+
+
+    public function __construct()
+    {
+        $this->clientes = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+
 
     public function getId(): ?int
     {
@@ -73,9 +89,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getRoles(): array
     {
         $roles = $this->roles;
-        // guarantee every user at least has ROLE_USER
-        $roles[] = 'ROLE_USER';
 
+
+
+        // Si el usuario tiene roles específicos, los asignamos
+        if (in_array('ROLE_SUPERADMIN', $this->roles)) {
+            $roles[] = 'ROLE_SUPERADMIN';
+        }
+
+        if (in_array('ROLE_GESTOR', $this->roles)) {
+            $roles[] = 'ROLE_GESTOR';
+        }
+
+        // Eliminar duplicados
         return array_unique($roles);
     }
 
@@ -133,6 +159,49 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setToken(?string $token): static
     {
         $this->token = $token;
+
+        return $this;
+    }
+
+
+    public function getEstado(): ?Estado
+    {
+        return $this->estado;
+    }
+
+    public function setEstado(?Estado $estado): static
+    {
+        $this->estado = $estado;
+
+        return $this;
+    }
+
+    public function getRawRoles(): array
+    {
+        return $this->roles;
+    }
+
+    public function getClientes(): Collection
+    {
+        return $this->clientes;
+    }
+
+    public function addCliente(Client $cliente): static
+    {
+        if (!$this->clientes->contains($cliente)) {
+            $this->clientes[] = $cliente;
+            $cliente->setGestor(in_array('ROLE_GESTOR', $this->roles) ? $this : null);
+        }
+
+        return $this;
+    }
+    public function removeCliente(Client $cliente): static
+    {
+        if ($this->clientes->removeElement($cliente)) {
+            if ($cliente->getGestor() === $this) {
+                $cliente->setGestor(null);
+            }
+        }
 
         return $this;
     }
