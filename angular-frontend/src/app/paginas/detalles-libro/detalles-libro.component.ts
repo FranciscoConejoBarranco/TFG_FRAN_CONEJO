@@ -1,50 +1,61 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LibroDetalles } from '../../shared/interfaces/libro-detalles'; 
+import { LibroDetalles } from '../../shared/interfaces/libro-detalles';
 import { LibrosRelacionadosComponent } from '../../modules/libros-relacionados/libros-relacionados.component';
 import { ReviewComponent } from '../../modules/review/review.component';
+
+import { ActivatedRoute, RouterModule } from '@angular/router';
+import { LibroService } from '../../shared/services/libroservice';
+import { LibroInterface } from '../../shared/interfaces/libro-interface';
 
 @Component({
   selector: 'app-detalles-libro',
   standalone: true,
-  imports: [CommonModule, LibrosRelacionadosComponent, ReviewComponent],
+  imports: [CommonModule, ReviewComponent, RouterModule],
   templateUrl: './detalles-libro.component.html',
-  styleUrl: './detalles-libro.component.css'
+  styleUrl: './detalles-libro.component.css',
 })
-export class DetallesLibroComponent {
+export class DetallesLibroComponent implements OnInit {
+  selectedBook!: LibroInterface;
+  relatedBooks: LibroInterface[] = [];
 
-  selectedBook: LibroDetalles = {
-    id: 1,
-    title: "El nombre del viento",
-    author: "Patrick Rothfuss",
-    genre: "Fantasía",
-    rating: 4.5,
-    description: "Kvothe, un joven músico y mago, relata su transformación de niño de la calle a estudiante de artes mágicas. Una historia épica de aventura, magia y misterio que ha cautivado a lectores de todo el mundo.",
-    coverImage: "https://images.pexels.com/photos/6806609/pexels-photo-6806609.jpeg",
-    releaseDate: "2007",
-    pages: 662,
-  };
+  constructor(
+    private route: ActivatedRoute,
+    private libroService: LibroService
+  ) {}
 
-  relatedBooks: LibroDetalles[] = [
-    {
-      id: 2,
-      title: "El temor de un hombre sabio",
-      author: "Patrick Rothfuss",
-      coverImage: "https://images.pexels.com/photos/4256852/pexels-photo-4256852.jpeg",
-    },
-    {
-      id: 3,
-      title: "El camino de los reyes",
-      author: "Brandon Sanderson",
-      coverImage: "https://images.pexels.com/photos/7809122/pexels-photo-7809122.jpeg",
-    },
-    {
-      id: 4,
-      title: "Elantris",
-      author: "Brandon Sanderson",
-      coverImage: "https://images.pexels.com/photos/6806609/pexels-photo-6806609.jpeg",
-    },
-  ];
+  ngOnInit(): void {
+    this.route.queryParams.subscribe((params) => {
+      const titulo = params['titulo'];
+
+      if (titulo) {
+        this.libroService.buscarLibro(titulo).subscribe({
+          next: (libro) => {
+            this.selectedBook = libro;
+          },
+          error: () => {
+            console.error('Libro no encontrado');
+            // Aquí podrías redirigir o mostrar un mensaje
+          },
+        });
+      }
+    });
+  }
+
+
+  getAmazonLink(titulo: string): string {
+    // Convierte el título en un slug tipo "padre-rico-padre-pobre"
+    const slug = titulo
+      .toLowerCase()
+      .normalize('NFD')                   // Quita acentos
+      .replace(/[\u0300-\u036f]/g, '')    // Regex para quitar los diacríticos
+      .replace(/[^a-z0-9\s-]/g, '')       // Quita caracteres especiales
+      .replace(/\s+/g, '-')               // Sustituye espacios por guiones
+      .replace(/-+/g, '-')                // Limpia guiones duplicados
+      .trim();
+  
+    return `https://www.amazon.es/s?k=${slug}&tag=tuaffid-21`;
+  }
 
   goToLanding(): void {
     window.location.href = '/';

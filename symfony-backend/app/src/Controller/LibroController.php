@@ -15,35 +15,109 @@ use App\Service\LibroApiService;
 
 class LibroController extends AbstractController
 {
-    #[Route('/importar-libros', name: 'api_importar_libros', methods: ['POST'])]
-    public function importarLibrosDesdeGoogleBooks(
-        HttpClientInterface $httpClient,
-        EntityManagerInterface $em
-    ): JsonResponse {
-        $query = 'fantasy';
-        $url = 'https://www.googleapis.com/books/v1/volumes?q=' . urlencode($query);
+    // #[Route('/libros/buscar', name: 'buscar_libros', methods: ['GET'])]
+    // public function buscarLibro(
+    //     Request $request,
+    //     EntityManagerInterface $em,
+    //     LibroApiService $api
+    // ): JsonResponse {
+    //     $titulo = $request->query->get('titulo');
 
-        $response = $httpClient->request('GET', $url);
-        $data = $response->toArray();
+    //     if (!$titulo) {
+    //         return new JsonResponse(['error' => 'El parámetro título es requerido'], 400);
+    //     }
 
-        foreach ($data['items'] ?? [] as $item) {
-            $info = $item['volumeInfo'];
+    //     // 1. Buscar en base de datos con búsqueda flexible
+    //     $libro = $this->buscarLibroFlexible($em, $titulo);
 
-            $libro = new Libro();
-            $libro->setTitulo($info['title'] ?? 'Sin título');
-            $libro->setAutor($info['authors'][0] ?? 'Autor desconocido');
-            $libro->setGenero($info['categories'][0] ?? 'Desconocido');
-            $libro->setSinopsis($info['description'] ?? 'Sin sinopsis');
-            $libro->setImagen($info['imageLinks']['thumbnail'] ?? null);
+    //     if ($libro) {
+    //         return $this->json($libro, 200);
+    //     }
 
-            $em->persist($libro);
-        }
+    //     // 2. Buscar en API externa
+    //     try {
+    //         $datosLibro = $api->buscarLibroPorTitulo($titulo);
 
-        $em->flush();
+    //         if (!$datosLibro) {
+    //             return new JsonResponse(['mensaje' => 'No se encontró el libro'], 404);
+    //         }
 
-        return new JsonResponse(['mensaje' => 'Libros importados correctamente']);
-    }
+    //         // 3. Verificar una vez más antes de crear (por si el título de la API coincide)
+    //         $libroExistente = $this->buscarLibroFlexible($em, $datosLibro['titulo']);
 
+    //         if ($libroExistente) {
+    //             return $this->json($libroExistente, 200);
+    //         }
+
+    //         // 4. Crear y guardar nuevo libro
+    //         $libro = new Libro();
+    //         $libro->setTitulo($datosLibro['titulo']);
+    //         $libro->setAutor($datosLibro['autor']);
+    //         $libro->setGenero($datosLibro['genero']);
+    //         $libro->setSinopsis($datosLibro['sinopsis']);
+    //         $libro->setImagen($datosLibro['imagen']);
+
+    //         $em->persist($libro);
+    //         $em->flush();
+
+    //         return $this->json($libro, 201);
+    //     } catch (\Exception $e) {
+    //         return new JsonResponse([
+    //             'error' => 'Error al buscar el libro en la API externa'
+    //         ], 500);
+    //     }
+    // }
+
+    // private function buscarLibroFlexible(EntityManagerInterface $em, string $titulo): ?Libro
+    // {
+    //     // Limpiar el título de búsqueda
+    //     $tituloLimpio = $this->limpiarTitulo($titulo);
+
+    //     // 1. Búsqueda exacta (case-insensitive)
+    //     $libro = $em->getRepository(Libro::class)
+    //         ->createQueryBuilder('l')
+    //         ->where('LOWER(TRIM(l.titulo)) = LOWER(TRIM(:titulo))')
+    //         ->setParameter('titulo', $titulo)
+    //         ->getQuery()
+    //         ->getOneOrNullResult();
+
+    //     if ($libro) {
+    //         return $libro;
+    //     }
+
+    //     // 2. Búsqueda por palabras clave (más flexible)
+    //     $palabras = explode(' ', $tituloLimpio);
+    //     $palabras = array_filter($palabras, function ($palabra) {
+    //         return strlen($palabra) > 2; // Ignorar palabras muy cortas
+    //     });
+
+    //     if (count($palabras) >= 2) {
+    //         $qb = $em->getRepository(Libro::class)->createQueryBuilder('l');
+
+    //         foreach ($palabras as $index => $palabra) {
+    //             $qb->andWhere("LOWER(l.titulo) LIKE LOWER(:palabra{$index})")
+    //                 ->setParameter("palabra{$index}", "%{$palabra}%");
+    //         }
+
+    //         $libro = $qb->getQuery()->getOneOrNullResult();
+
+    //         if ($libro) {
+    //             return $libro;
+    //         }
+    //     }
+
+    //     return null;
+    // }
+
+    // private function limpiarTitulo(string $titulo): string
+    // {
+    //     // Remover caracteres especiales y normalizar
+    //     $titulo = strtolower(trim($titulo));
+    //     $titulo = preg_replace('/[^\w\s]/', ' ', $titulo); // Remover puntuación
+    //     $titulo = preg_replace('/\s+/', ' ', $titulo); // Múltiples espacios a uno
+
+    //     return $titulo;
+    // }
 
     #[Route('/libros/buscar', name: 'buscar_libros', methods: ['GET'])]
     public function buscarLibro(
@@ -53,31 +127,99 @@ class LibroController extends AbstractController
     ): JsonResponse {
         $titulo = $request->query->get('titulo');
 
-        // 1. Buscar en base de datos
-        $libro = $em->getRepository(Libro::class)->findOneBy(['titulo' => $titulo]);
+        if (!$titulo) {
+            return new JsonResponse(['error' => 'El parámetro título es requerido'], 400);
+        }
+
+        // 1. Buscar en base de datos con búsqueda flexible
+        $libro = $this->buscarLibroFlexible($em, $titulo);
 
         if ($libro) {
-            return $this->json($libro);
+            return $this->json($libro, 200);
         }
 
-        // 2. Buscar en OpenLibrary
-        $datos = $api->buscarLibroPorTitulo($titulo);
+        // 2. Buscar en API externa
+        try {
+            $datosLibro = $api->buscarLibroPorTitulo($titulo);
 
-        if (!$datos) {
-            return new JsonResponse(['mensaje' => 'No se encontró el libro'], 404);
+            if (!$datosLibro) {
+                return new JsonResponse(['mensaje' => 'No se encontró el libro'], 404);
+            }
+
+            // 3. Verificar una vez más antes de crear (por si el título de la API coincide)
+            $libroExistente = $this->buscarLibroFlexible($em, $datosLibro['titulo']);
+
+            if ($libroExistente) {
+                return $this->json($libroExistente, 200);
+            }
+
+            // 4. Crear y guardar nuevo libro
+            $libro = new Libro();
+            $libro->setTitulo($datosLibro['titulo']);
+            $libro->setAutor($datosLibro['autor']);
+            $libro->setGenero($datosLibro['genero']);
+            $libro->setSinopsis($datosLibro['sinopsis']);
+            $libro->setImagen($datosLibro['imagen']);
+
+            $em->persist($libro);
+            $em->flush();
+
+            return $this->json($libro, 201);
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'error' => 'Error al buscar el libro en la API externa'
+            ], 500);
+        }
+    }
+
+    private function buscarLibroFlexible(EntityManagerInterface $em, string $titulo): ?Libro
+    {
+        // Limpiar el título de búsqueda
+        $tituloLimpio = $this->limpiarTitulo($titulo);
+
+        // 1. Búsqueda exacta (case-insensitive)
+        $libro = $em->getRepository(Libro::class)
+            ->createQueryBuilder('l')
+            ->where('LOWER(TRIM(l.titulo)) = LOWER(TRIM(:titulo))')
+            ->setParameter('titulo', $titulo)
+            ->getQuery()
+            ->getOneOrNullResult();
+
+        if ($libro) {
+            return $libro;
         }
 
-        // 3. Guardar en base de datos
-        $libro = new Libro();
-        $libro->setTitulo($datos['titulo']);
-        $libro->setAutor($datos['autor']);
-        $libro->setGenero($datos['genero']);
-        $libro->setSinopsis($datos['sinopsis']);
-        $libro->setImagen($datos['imagen']);
+        // 2. Búsqueda por palabras clave (más flexible)
+        $palabras = explode(' ', $tituloLimpio);
+        $palabras = array_filter($palabras, function ($palabra) {
+            return strlen($palabra) > 2; // Ignorar palabras muy cortas
+        });
 
-        $em->persist($libro);
-        $em->flush();
+        if (count($palabras) >= 2) {
+            $qb = $em->getRepository(Libro::class)->createQueryBuilder('l');
 
-        return $this->json($libro, 201);
+            foreach ($palabras as $index => $palabra) {
+                $qb->andWhere("LOWER(l.titulo) LIKE LOWER(:palabra{$index})")
+                    ->setParameter("palabra{$index}", "%{$palabra}%");
+            }
+
+            $libro = $qb->getQuery()->getOneOrNullResult();
+
+            if ($libro) {
+                return $libro;
+            }
+        }
+
+        return null;
+    }
+
+    private function limpiarTitulo(string $titulo): string
+    {
+        // Remover caracteres especiales y normalizar
+        $titulo = strtolower(trim($titulo));
+        $titulo = preg_replace('/[^\w\s]/', ' ', $titulo); // Remover puntuación
+        $titulo = preg_replace('/\s+/', ' ', $titulo); // Múltiples espacios a uno
+
+        return $titulo;
     }
 }

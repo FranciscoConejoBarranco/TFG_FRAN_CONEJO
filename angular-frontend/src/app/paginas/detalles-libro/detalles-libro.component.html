@@ -1,58 +1,134 @@
-<main class="relative min-h-screen text-white bg-neutral-900">
-  <section class="overflow-hidden relative w-full h-[70vh]">
-    <button
-      class="fixed top-8 left-8 z-10 gap-2 px-6 py-3 rounded-lg cursor-pointer bg-transparent border border-white text-white hover:bg-blue-700 hover:bg-opacity-10 transition-all duration-300"
-      (click)="goToLanding()"
+<main
+  class="relative min-h-screen text-white bg-gradient-to-br from-neutral-900 via-neutral-800 to-neutral-900 overflow-hidden"
+  *ngIf="selectedBook"
+>
+  <!-- Efectos de fondo -->
+  <div class="absolute inset-0 opacity-20">
+    <div
+      class="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent transform rotate-45"
+    ></div>
+    <div
+      class="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-blue-500/5 via-transparent to-purple-500/5"
+    ></div>
+  </div>
+
+  <!-- Gradiente de luz -->
+  <div
+    class="absolute top-0 left-1/2 transform -translate-x-1/2 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl"
+  ></div>
+  <div
+    class="absolute bottom-0 right-0 w-72 h-72 bg-purple-500/10 rounded-full blur-3xl"
+  ></div>
+
+  <div class="sticky top-0 z-50 px-10 pt-6 bg-transparent">
+    <a
+      class="inline-flex items-center gap-2 px-6 py-3 rounded-xl cursor-pointer bg-black/20 backdrop-blur-md border border-white/20 text-white hover:bg-blue-600/20 hover:border-blue-400/50 transition-all duration-500 transform hover:scale-105 hover:shadow-lg hover:shadow-blue-500/25"
+      [routerLink]="['/home']"
+      routerLinkActive="router-link-active"
     >
-      ← Volver
-    </button>
+      <span
+        class="inline-block transition-transform duration-300 hover:-translate-x-1"
+        >←</span
+      >
+      Volver
+    </a>
+  </div>
 
-    <img
-      class="object-cover overflow-hidden aspect-square size-full"
-      [src]="selectedBook.coverImage"
-      [alt]="selectedBook.title"
-    />
+  <section
+    class="flex flex-col-reverse md:flex-row items-center justify-between gap-8 px-10 py-16 md:py-28 relative z-10"
+  >
+    <!-- Contenido -->
+    <div class="w-full md:w-1/2 space-y-6">
+      <h1
+        class="mb-4 text-5xl max-sm:text-3xl font-bold bg-gradient-to-r from-white via-blue-100 to-white bg-clip-text text-transparent"
+      >
+        {{ selectedBook.titulo }}
+      </h1>
 
-    <div class="absolute inset-0">
-      <article class="absolute bottom-[10%] left-[5%] max-w-[600px]">
-        <h1 class="mb-4 text-5xl max-sm:text-3xl">
-          {{selectedBook.title}}
-        </h1>
-        <div class="flex gap-4 items-center mb-4">
-          <span class="text-amber-400">
-            <span>★</span>
-            <span>{{selectedBook.rating}}</span>
-          </span>
-          <span>|</span>
-          <span>{{selectedBook.releaseDate}}</span>
-          <span>|</span>
-          <span>
-            <span>{{selectedBook.pages}}</span>
-            <span>páginas</span>
-          </span>
-        </div>
-        <p class="mb-8 text-lg leading-relaxed max-sm:text-base">
-          {{selectedBook.description}}
-        </p>
-        <div class="flex gap-4">
-          <button
-            class="px-8 py-3 text-lg bg-blue-600 rounded-lg cursor-pointer border-[none] text-[white] hover:bg-blue-700"
+      <div
+        class="flex gap-4 items-center mb-4 text-sm md:text-base bg-black/20 backdrop-blur-sm rounded-full px-6 py-3 border border-white/10"
+      >
+        <!-- <span class="text-amber-400 flex items-center gap-1">
+          <span class="animate-pulse">★</span> {{ selectedBook.valoracion || 4.5 }}
+        </span> -->
+        <span class="text-white/60">|</span>
+        <span class="hover:text-blue-300 transition-colors duration-300"
+          >Autor: {{ selectedBook.autor }}</span
+        >
+        <span class="text-white/60">|</span>
+        <span class="hover:text-purple-300 transition-colors duration-300"
+          >Género: {{ selectedBook.genero }}</span
+        >
+      </div>
+
+      <p
+        class="mb-8 text-lg leading-relaxed max-sm:text-base text-white/90 backdrop-blur-sm bg-black/10 rounded-2xl p-6 border border-white/10 hover:bg-black/20 transition-all duration-500"
+      >
+        {{ selectedBook.sinopsis }}
+      </p>
+
+      <div class="flex gap-4 flex-wrap">
+        <a
+          class="group px-8 py-4 text-lg bg-gradient-to-r from-blue-600 to-blue-700 rounded-xl cursor-pointer border-none text-white hover:from-blue-500 hover:to-blue-600 transition-all duration-500 transform hover:scale-105 hover:shadow-2xl hover:shadow-blue-500/50 relative overflow-hidden"
+          [href]="getAmazonLink(selectedBook.titulo)"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <span class="relative z-10">Leer ahora</span>
+          <div
+            class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"
+          ></div>
+        </a>
+
+        <button
+          class="group px-8 py-4 text-lg rounded-xl cursor-pointer bg-black/20 backdrop-blur-md border border-white/30 text-white hover:bg-blue-600/20 hover:border-blue-400/60 transition-all duration-500 transform hover:scale-105 hover:shadow-lg hover:shadow-white/20 relative overflow-hidden"
+        >
+          <span
+            class="relative z-10 group-hover:text-blue-200 transition-colors duration-300"
+            >+ Mi lista</span
           >
-            Leer ahora
-          </button>
-          <button
-            class="px-8 py-3 text-lg rounded-lg cursor-pointer bg-transparent border border-white text-white hover:bg-blue-700 hover:bg-opacity-20 transition-all duration-300"
-          >
-            + Mi lista
-          </button>
-        </div>
-      </article>
+          <div
+            class="absolute inset-0 bg-gradient-to-r from-blue-600/0 via-blue-600/20 to-blue-600/0 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-center"
+          ></div>
+        </button>
+      </div>
+    </div>
+
+    <!-- Imagen del libro -->
+    <div class="w-full md:w-1/2 flex justify-center relative">
+      <!-- Efectos de resplandor -->
+      <div
+        class="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-3xl blur-2xl transform rotate-6 scale-110"
+      ></div>
+      <div
+        class="absolute inset-0 bg-gradient-to-l from-purple-500/10 to-blue-500/10 rounded-3xl blur-xl transform -rotate-3 scale-105"
+      ></div>
+
+      <div class="relative group">
+        <img
+          [src]="selectedBook.imagen"
+          class="w-[200px] h-auto rounded-2xl filter contrast-110 brightness-105 shadow-2xl shadow-black/50 transform transition-all duration-700 group-hover:scale-105 group-hover:rotate-1 group-hover:shadow-blue-500/30 border border-white/20"
+        />
+
+        <!-- Overlay con efecto de brillo -->
+        <div
+          class="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-white/20 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+        ></div>
+
+        <!-- Partículas flotantes -->
+        <div
+          class="absolute -top-2 -right-2 w-3 h-3 bg-blue-400 rounded-full animate-bounce opacity-60"
+        ></div>
+        <div
+          class="absolute -bottom-4 -left-4 w-2 h-2 bg-purple-400 rounded-full animate-bounce opacity-40"
+          style="animation-delay: 0.5s"
+        ></div>
+        <div
+          class="absolute top-1/3 -right-6 w-1 h-1 bg-white rounded-full animate-ping opacity-30"
+        ></div>
+      </div>
     </div>
   </section>
-
-  <app-libros-relacionados
-    [relatedBooks]="relatedBooks"
-  ></app-libros-relacionados>
 
   <app-review></app-review>
 </main>

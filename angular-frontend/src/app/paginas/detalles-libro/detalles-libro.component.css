@@ -1,0 +1,6 @@
+/* En styles.css o tailwind.config.ts */
+.image-render {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+  
