@@ -17,7 +17,9 @@ export class NavbarDashboardComponent implements OnInit {
   constructor(private authService: AuthService) {}
 
   ngOnInit(): void {
-    this.role = this.authService.getUserRole() ?? [];
+    this.authService.fetchUser().subscribe((user) => {
+      this.role = user?.role ?? [];
+    });
   }
 
   toggleMenu() {
