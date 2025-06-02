@@ -1,17 +1,17 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LibroDetalles } from '../../shared/interfaces/libro-detalles';
-import { LibrosRelacionadosComponent } from '../../modules/libros-relacionados/libros-relacionados.component';
-import { ReviewComponent } from '../../modules/review/review.component';
-
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { LibroService } from '../../shared/services/libroservice';
+import { ListaLecturaService } from '../../shared/services/lista-lectura.service';
 import { LibroInterface } from '../../shared/interfaces/libro-interface';
+import { ListaLecturaInterface } from '../../shared/interfaces/lista-lectura.interface';
+import { ReviewComponent } from '../../modules/review/review.component';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-detalles-libro',
   standalone: true,
-  imports: [CommonModule, ReviewComponent, RouterModule],
+  imports: [CommonModule, ReviewComponent, RouterModule, FormsModule],
   templateUrl: './detalles-libro.component.html',
   styleUrl: './detalles-libro.component.css',
 })
@@ -19,9 +19,14 @@ export class DetallesLibroComponent implements OnInit {
   selectedBook!: LibroInterface;
   relatedBooks: LibroInterface[] = [];
 
+  listas: ListaLecturaInterface[] = [];
+  mostrarMenuListas = false;
+  nuevaListaNombre = '';
+
   constructor(
     private route: ActivatedRoute,
-    private libroService: LibroService
+    private libroService: LibroService,
+    private listaLecturaService: ListaLecturaService
   ) {}
 
   ngOnInit(): void {
@@ -35,29 +40,82 @@ export class DetallesLibroComponent implements OnInit {
           },
           error: () => {
             console.error('Libro no encontrado');
-            // Aquí podrías redirigir o mostrar un mensaje
           },
         });
       }
     });
   }
 
-
   getAmazonLink(titulo: string): string {
-    // Convierte el título en un slug tipo "padre-rico-padre-pobre"
     const slug = titulo
       .toLowerCase()
-      .normalize('NFD')                   // Quita acentos
-      .replace(/[\u0300-\u036f]/g, '')    // Regex para quitar los diacríticos
-      .replace(/[^a-z0-9\s-]/g, '')       // Quita caracteres especiales
-      .replace(/\s+/g, '-')               // Sustituye espacios por guiones
-      .replace(/-+/g, '-')                // Limpia guiones duplicados
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
       .trim();
-  
+
     return `https://www.amazon.es/s?k=${slug}&tag=tuaffid-21`;
   }
 
   goToLanding(): void {
     window.location.href = '/';
   }
+
+  onClickMiLista(): void {
+    this.listaLecturaService.obtenerListas().subscribe({
+      next: (listas) => {
+        this.listas = listas;
+        this.mostrarMenuListas = true;
+      },
+      error: () => {
+        console.error('Error al cargar listas');
+      },
+    });
+  }
+
+  agregarLibroALista(listaId: number): void {
+    this.listaLecturaService.agregarLibroALista(this.selectedBook.id, listaId).subscribe({
+      next: () => {
+        this.mostrarMenuListas = false;
+        alert('Libro añadido a la lista');
+      },
+      error: () => {
+        alert('Error al añadir el libro a la lista');
+      },
+    });
+  }
+
+  crearNuevaLista(): void {
+    if (!this.nuevaListaNombre.trim()) {
+      alert('El nombre de la lista no puede estar vacío');
+      return;
+    }
+  
+    const nuevaLista: ListaLecturaInterface = {
+      id: 0, // El backend debe asignar un ID
+      nombre: this.nuevaListaNombre,
+      libros: [{
+        libroId: this.selectedBook.id,
+        titulo: this.selectedBook.titulo,
+        estadoLectura: 'pendiente' // o lo que quieras por defecto
+      }],
+      fechaCreacion: new Date().toISOString(), // Fecha actual
+      usuario: 0 // Reemplazar con el ID numérico del usuario actual si está disponible
+    };
+  
+    this.listaLecturaService.crearLista(nuevaLista.nombre).subscribe({
+      next: (listaCreada) => {
+        this.listas.push(listaCreada);
+        this.mostrarMenuListas = false;
+        this.nuevaListaNombre = '';
+        alert('Lista creada y libro añadido');
+      },
+      error: () => {
+        alert('Error al crear la lista');
+      },
+    });
+  }
+  
 }

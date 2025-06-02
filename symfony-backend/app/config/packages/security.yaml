@@ -1,31 +1,19 @@
 security:
-    # Hasheado de contraseñas
     password_hashers:
         Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
 
-    # Proveedor de usuarios (usamos la entidad User, autenticamos por email)
     providers:
         app_user_provider:
             entity:
                 class: App\Entity\User
                 property: email
 
-    # Firewalls (zonas de autenticación)
     firewalls:
-        # Dev: desactivado para recursos estáticos y profiler
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
 
-        # API protegida con JWT y stateless
-        api:
-            pattern: ^/api
-            stateless: true
-            provider: app_user_provider
-            custom_authenticators:
-                - App\Security\CustomAuthenticator
-
-        # Rutas de autenticación: login, logout, register, me
+        # Rutas de autenticación públicas
         auth:
             pattern: ^/auth
             stateless: true
@@ -33,20 +21,28 @@ security:
             custom_authenticators:
                 - App\Security\CustomAuthenticator
 
-        # Firewall principal (puede usarse si activas sesiones en el futuro)
+        # API protegida con JWT
+        api:
+            pattern: ^/api
+            stateless: true
+            provider: app_user_provider
+            custom_authenticators:
+                - App\Security\CustomAuthenticator
+
         main:
             lazy: true
             provider: app_user_provider
 
-    # Control de acceso a rutas
     access_control:
-        - { path: ^/auth/login, roles: PUBLIC_ACCESS }         # ✅ Login es público
-        - { path: ^/auth/register, roles: PUBLIC_ACCESS }    # ✅ Solo los superadmins pueden registrar
-        # - { path: ^/api/clients/create, roles: ROLE_SUPERADMIN } # 👑 Zona protegida solo para superadmins
-        # - { path: ^/api/clients/\d+$, roles: ROLE_SUPERADMIN } # Permitir editar cliente por ID
-        - { path: ^/auth/me, roles: PUBLIC_ACCESS }   # ✅ Solo usuarios autenticados pueden consultar /me
+        # Rutas públicas de autenticación
+        - { path: ^/auth/login, roles: PUBLIC_ACCESS }
+        - { path: ^/auth/register, roles: PUBLIC_ACCESS }
         - { path: ^/auth/logout, roles: PUBLIC_ACCESS}
-        - { path: ^/importar-libros, roles: PUBLIC_ACCESS} # ✅ Logout requiere autenticación
+        - { path: ^/auth/me, roles: PUBLIC_ACCESS }
+        - { path: ^/importar-libros, roles: PUBLIC_ACCESS}
+        
+        # Todas las rutas de API requieren autenticación
+        - { path: ^/api, roles: ROLE_USER }
 
 when@test:
     security:
