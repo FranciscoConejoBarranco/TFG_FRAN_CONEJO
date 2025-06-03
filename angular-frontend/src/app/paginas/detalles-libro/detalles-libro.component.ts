@@ -76,17 +76,25 @@ export class DetallesLibroComponent implements OnInit {
   }
 
   agregarLibroALista(listaId: number): void {
-    this.listaLecturaService.agregarLibroALista(this.selectedBook.id, listaId).subscribe({
+    const libroId = this.selectedBook.id;
+    const estadoLectura = 'pendiente'; // O lo que corresponda (puede venir de un selector)
+  
+    this.listaLecturaService.agregarLibroALista(listaId, libroId, estadoLectura).subscribe({
       next: () => {
         this.mostrarMenuListas = false;
         alert('Libro añadido a la lista');
       },
-      error: () => {
-        alert('Error al añadir el libro a la lista');
+      error: (error) => {
+        console.error(error);
+        if (error.status === 409) {
+          alert(' Este libro ya está en la lista.');
+        } else {
+          alert(' Error al añadir el libro a la lista.');
+        }
       },
     });
   }
-
+  
   crearNuevaLista(): void {
     if (!this.nuevaListaNombre.trim()) {
       alert('El nombre de la lista no puede estar vacío');

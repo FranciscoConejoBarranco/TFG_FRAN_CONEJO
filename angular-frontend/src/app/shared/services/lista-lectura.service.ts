@@ -5,10 +5,9 @@ import { environment } from '../../../environment/environment';
 import { ListaLecturaInterface } from '../interfaces/lista-lectura.interface';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ListaLecturaService {
-
   private apiUrl = `${environment.api}api/lista-lectura`;
 
   constructor(private _http: HttpClient) {}
@@ -25,7 +24,6 @@ export class ListaLecturaService {
       { nombre },
       { headers: headers, withCredentials: true }
     );
-    
   }
 
   /**
@@ -33,7 +31,7 @@ export class ListaLecturaService {
    */
   obtenerListas(): Observable<ListaLecturaInterface[]> {
     return this._http.get<ListaLecturaInterface[]>(this.apiUrl, {
-      withCredentials: true
+      withCredentials: true,
     });
   }
 
@@ -42,14 +40,17 @@ export class ListaLecturaService {
    */
   obtenerDetalle(id: number): Observable<ListaLecturaInterface> {
     return this._http.get<ListaLecturaInterface>(`${this.apiUrl}/${id}`, {
-      withCredentials: true
+      withCredentials: true,
     });
   }
 
   /**
    * Actualiza el nombre de una lista.
    */
-  actualizarLista(id: number, nombre: string): Observable<ListaLecturaInterface> {
+  actualizarLista(
+    id: number,
+    nombre: string
+  ): Observable<ListaLecturaInterface> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
 
     return this._http.put<ListaLecturaInterface>(
@@ -63,22 +64,57 @@ export class ListaLecturaService {
    * Elimina una lista por ID.
    */
   eliminarLista(id: number): Observable<{ message: string }> {
-    return this._http.delete<{ message: string }>(
-      `${this.apiUrl}/${id}`,
-      { withCredentials: true }
-    );
+    return this._http.delete<{ message: string }>(`${this.apiUrl}/${id}`, {
+      withCredentials: true,
+    });
   }
 
   /**
    * Agrega un libro a una lista.
    */
-  agregarLibroALista(libroId: number, listaId: number): Observable<{ message: string }> {
+  agregarLibroALista(
+    listaId: number,
+    libroId: number,
+    estadoLectura: string
+  ): Observable<{ message: string }> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
 
+    const payload = {
+      libroId: libroId,
+      estadoLectura: estadoLectura,
+    };
+
     return this._http.post<{ message: string }>(
-      `${this.apiUrl}/${listaId}/agregar-libro`,
-      { libroId },
-      { headers: headers, withCredentials: true }
+      `${this.apiUrl}/${listaId}/add-libro`,
+      payload,
+      {
+        headers: headers,
+        withCredentials: true,
+      }
+    );
+  }
+
+  /**
+   * Elimina un libro de una lista de lectura.
+   */
+  eliminarLibroDeLista(
+    listaId: number,
+    libroId: number
+  ): Observable<{ message: string }> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+
+    const payload = {
+      libroId: libroId,
+    };
+
+    return this._http.request<{ message: string }>(
+      'DELETE',
+      `${this.apiUrl}/${listaId}/remove-libro`,
+      {
+        body: payload,
+        headers: headers,
+        withCredentials: true,
+      }
     );
   }
 }
