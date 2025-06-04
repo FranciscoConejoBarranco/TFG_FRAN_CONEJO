@@ -194,4 +194,19 @@
       </button>
     </div>
   </div>
+
+  <!-- PAGINACIÓN CON ANGULAR MATERIAL - AÑADIR ESTO -->
+  <div *ngIf="!loading && reviews.length > 0" class="flex justify-center mt-8">
+    <mat-paginator
+      [length]="totalReviewsCount"
+      [pageSize]="pageSize"
+      [pageSizeOptions]="pageSizeOptions"
+      [pageIndex]="currentPage - 1"
+      (page)="onPageChange($event)"
+      showFirstLastButtons
+      class="!bg-black !text-white border border-gray-700 rounded-lg"
+      style="background-color: black !important; color: white !important"
+    >
+    </mat-paginator>
+  </div>
 </section>

@@ -3,17 +3,46 @@
 <div class="bg-black min-h-screen text-white overflow-x-hidden max-w-screen px-4 py-10 sm:pl-72">
   <h1 class="text-3xl font-semibold mb-8">Perfil de Usuario</h1>
 
-  <div class="bg-[#1c1c1c] rounded-xl p-6 shadow-lg max-w-xl mx-auto">
+  <!-- Loading spinner -->
+  <div *ngIf="loading" class="flex justify-center items-center py-20">
+    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+  </div>
+
+  <!-- Perfil del usuario -->
+  <div *ngIf="!loading && usuario" class="bg-[#1c1c1c] rounded-xl p-6 shadow-lg max-w-xl mx-auto">
     <div class="mb-6">
-      <h2 class="text-2xl font-bold mb-2">Fran Conejo</h2>
-      <p class="text-gray-400">franconejo</p>
+      <h2 class="text-2xl font-bold mb-2">{{ usuario.name }}</h2>
+      <p class="text-gray-400">ID de usuario: {{ usuario.id }}</p>
     </div>
 
-    <div class="mb-6">
-      <p class="text-gray-300"><span class="font-semibold">Miembro desde:</span> Enero 2024</p>
-      <p class="text-gray-300"><span class="font-semibold">Listas creadas:</span> 3</p>
-      <p class="text-gray-300"><span class="font-semibold">Libros leídos:</span> 42</p>
+    <div class="mb-6 space-y-3">
+      <div class="flex justify-between items-center py-2 border-b border-gray-700">
+        <span class="font-semibold text-gray-300">Nombre:</span>
+        <span class="text-white">{{ usuario.name }}</span>
+      </div>
+      
+      <div class="flex justify-between items-center py-2 border-b border-gray-700">
+        <span class="font-semibold text-gray-300">ID de usuario:</span>
+        <span class="text-white">{{ usuario.id }}</span>
+      </div>
+      
+      
     </div>
-    
+
+    <!-- Información adicional -->
+    <div class="bg-neutral-800/50 rounded-lg p-4 mb-6">
+      <h3 class="text-lg font-semibold mb-3 text-blue-400">Estado de la cuenta</h3>
+      <div class="flex items-center gap-2">
+        <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+        <span class="text-green-400 font-medium">Cuenta activa</span>
+      </div>
+    </div>
+
+  <!-- Mensaje si no hay usuario -->
+  <div *ngIf="!loading && !usuario" class="text-center py-20">
+    <div class="bg-red-900/20 border border-red-700 rounded-xl p-6 max-w-md mx-auto">
+      <h3 class="text-xl font-medium text-red-400 mb-2">Error al cargar perfil</h3>
+      <p class="text-red-300 text-sm">No se pudieron obtener los datos del usuario.</p>
+    </div>
   </div>
 </div>

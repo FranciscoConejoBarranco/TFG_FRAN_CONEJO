@@ -7,13 +7,15 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ReviewService } from '../../shared/services/review.service';
 import { ReviewInterface } from '../../shared/interfaces/review.interface';
 
 @Component({
   selector: 'app-review',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, MatPaginatorModule, MatProgressSpinnerModule],
   templateUrl: './review.component.html',
   styleUrl: './review.component.css',
 })
@@ -26,11 +28,13 @@ export class ReviewComponent implements OnInit, OnChanges {
   nuevaValoracion = 5;
   mostrandoFormulario = false;
 
-  // Nuevas propiedades para paginación
+  // Propiedades para paginación con Angular Material
   currentPage = 1;
   totalPages = 1;
   totalReviewsCount = 0;
   loading = false;
+  pageSize = 10;
+  pageSizeOptions = [10]; // Solo 10 como opción
 
   constructor(private reviewService: ReviewService) {}
 
@@ -50,7 +54,7 @@ export class ReviewComponent implements OnInit, OnChanges {
   cargarReviews(page: number = this.currentPage): void {
     this.loading = true;
     this.reviewService
-      .obtenerReviewsPorLibro(this.libroId, page, 10)
+      .obtenerReviewsPorLibro(this.libroId, page, this.pageSize)
       .subscribe({
         next: (response) => {
           this.reviews = response.reviews;
@@ -71,9 +75,13 @@ export class ReviewComponent implements OnInit, OnChanges {
         },
       });
   }
-  
 
-  // Métodos de navegación
+  // Método para manejar el cambio de página con Angular Material
+  onPageChange(event: PageEvent): void {
+    this.cargarReviews(event.pageIndex + 1);
+  }
+
+  // Mantén todos tus métodos existentes sin cambios
   siguientePagina(): void {
     if (this.currentPage < this.totalPages) {
       this.cargarReviews(this.currentPage + 1);
@@ -92,10 +100,8 @@ export class ReviewComponent implements OnInit, OnChanges {
     }
   }
 
-  // Calcula el promedio de calificaciones
   get averageRating(): string {
     if (this.totalReviewsCount === 0) return '0.0';
-    // Por simplicidad, calculamos con las reviews de la página actual
     const sum = this.reviews.reduce(
       (total, review) => total + review.valoracion,
       0
@@ -105,23 +111,19 @@ export class ReviewComponent implements OnInit, OnChanges {
       : '0.0';
   }
 
-  // Obtiene el número total de reseñas
   get totalReviews(): number {
     return this.totalReviewsCount;
   }
 
-  // Convierte la calificación numérica en estrellas
   getStars(rating: number): string {
     let stars = '';
     const fullStars = Math.floor(rating);
     const halfStar = rating % 1 >= 0.5;
 
-    // Añadir estrellas completas
     for (let i = 0; i < fullStars; i++) {
       stars += '★';
     }
 
-    // Añadir media estrella si corresponde
     if (halfStar) {
       stars += '½';
     }
@@ -132,7 +134,6 @@ export class ReviewComponent implements OnInit, OnChanges {
   escribirResena(): void {
     this.mostrandoFormulario = !this.mostrandoFormulario;
     if (this.miReview && this.mostrandoFormulario) {
-      // Si ya tiene una review, cargar sus datos para editar
       this.nuevoContenido = this.miReview.contenido;
       this.nuevaValoracion = this.miReview.valoracion;
     }
@@ -150,7 +151,6 @@ export class ReviewComponent implements OnInit, OnChanges {
     }
 
     if (this.miReview) {
-      // Editar
       this.reviewService
         .editarReview(
           this.miReview.id,
@@ -176,7 +176,6 @@ export class ReviewComponent implements OnInit, OnChanges {
           },
         });
     } else {
-      // Crear
       this.reviewService
         .crearReview(this.nuevoContenido, this.libroId, this.nuevaValoracion)
         .subscribe({
@@ -208,7 +207,6 @@ export class ReviewComponent implements OnInit, OnChanges {
     this.nuevoContenido = '';
     this.nuevaValoracion = 5;
   }
-
 
   eliminarReview(): void {
     if (!this.miReview) return;

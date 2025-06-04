@@ -1,0 +1,45 @@
+/* Flechas del paginador en blanco */
+::ng-deep .mat-mdc-paginator .mat-mdc-icon-button .mat-mdc-button__icon,
+::ng-deep .mat-mdc-paginator .mat-mdc-icon-button mat-icon,
+::ng-deep .mat-mdc-paginator .mat-mdc-icon-button svg {
+  color: white !important;
+  fill: white !important;
+}
+
+::ng-deep .mat-mdc-paginator .mat-mdc-icon-button {
+  color: white !important;
+}
+
+::ng-deep .mat-mdc-paginator .mat-mdc-icon-button:hover {
+  background-color: #1a1a1a !important;
+}
+
+::ng-deep .mat-mdc-paginator .mat-mdc-select-arrow {
+  color: white !important;
+}
+
+::ng-deep .mat-mdc-paginator .mat-mdc-paginator-range-label {
+  color: white !important;
+}
+
+::ng-deep .mat-mdc-paginator .mat-mdc-select-value {
+  color: white !important;
+}
+
+::ng-deep .mat-mdc-select-panel {
+  background-color: #000000 !important;
+  border: 1px solid #333333 !important;
+}
+
+::ng-deep .mat-mdc-option {
+  color: white !important;
+  background-color: #000000 !important;
+}
+
+::ng-deep .mat-mdc-option:hover {
+  background-color: #1a1a1a !important;
+}
+
+::ng-deep .mat-mdc-progress-spinner circle {
+  stroke: #3b82f6 !important;
+}
