@@ -3,10 +3,11 @@
   <div class="flex justify-between items-center mb-8">
     <h2 class="text-3xl">Reseñas</h2>
     <button
+      *ngIf="!miReview"
       class="px-8 py-3 text-base bg-blue-600 rounded-lg cursor-pointer border-[none] text-[white] hover:bg-blue-700"
       (click)="escribirResena()"
     >
-      {{ miReview ? 'Editar mi reseña' : 'Escribir reseña' }}
+      Escribir reseña
     </button>
   </div>
 
@@ -57,10 +58,10 @@
                 </h3>
               </div>
 
-              <!-- Botones de acción solo para tu reseña -->
-              <div *ngIf="miReview && review.id === miReview.id" class="flex gap-2">
+              <!-- Botones de acción solo para tu reseña cuando NO está en modo edición -->
+              <div *ngIf="miReview && review.id === miReview.id && !mostrandoFormulario" class="flex gap-2">
                 <button
-                  (click)="escribirResena()"
+                  (click)="mostrandoFormulario = true"
                   class="p-2 text-blue-400 hover:text-blue-300 hover:bg-blue-900/30 rounded-lg transition-all duration-200"
                   title="Editar reseña"
                 >
@@ -80,7 +81,8 @@
               </div>
             </div>
 
-            <div class="flex gap-3 items-center">
+            <!-- Mostrar estrellas y fecha solo cuando NO está en modo edición -->
+            <div *ngIf="!(miReview && review.id === miReview.id && mostrandoFormulario)" class="flex gap-3 items-center">
               <div class="flex items-center gap-1">
                 <span class="text-amber-400 text-lg drop-shadow-sm">{{ getStars(review.valoracion) }}</span>
                 <span class="text-sm text-neutral-400 font-medium">({{ review.valoracion }}/5)</span>
@@ -93,23 +95,66 @@
         </div>
 
         <div class="ml-14">
-          <p class="leading-relaxed p-4 rounded-lg"
-             [ngClass]="{
-               'text-blue-50 bg-blue-900/15 border-l-2 border-l-blue-400': miReview && review.id === miReview.id,
-               'text-neutral-200 bg-neutral-800/40 border-l-2 border-l-neutral-600': !(miReview && review.id === miReview.id)
-             }">
-            {{ review.contenido }}
-          </p>
+          <!-- Mostrar contenido normal cuando NO está en modo edición -->
+          <div *ngIf="!(miReview && review.id === miReview.id && mostrandoFormulario)">
+            <p class="leading-relaxed p-4 rounded-lg"
+               [ngClass]="{
+                 'text-blue-50 bg-blue-900/15 border-l-2 border-l-blue-400': miReview && review.id === miReview.id,
+                 'text-neutral-200 bg-neutral-800/40 border-l-2 border-l-neutral-600': !(miReview && review.id === miReview.id)
+               }">
+              {{ review.contenido }}
+            </p>
+          </div>
+
+          <!-- Formulario de edición inline solo para tu reseña -->
+          <div *ngIf="miReview && review.id === miReview.id && mostrandoFormulario" 
+               class="bg-blue-900/15 border-l-2 border-l-blue-400 p-4 rounded-lg">
+            <div class="mb-4">
+              <label class="block text-sm font-medium mb-2 text-blue-300">Editar tu opinión:</label>
+              <textarea
+                [(ngModel)]="nuevoContenido"
+                rows="4"
+                class="w-full p-3 rounded bg-neutral-700 text-white border border-neutral-600 focus:border-blue-500 focus:outline-none"
+                placeholder="Actualiza tu experiencia..."
+              ></textarea>
+            </div>
+
+            <div class="mb-4">
+              <label class="block text-sm font-medium mb-2 text-blue-300">Valoración:</label>
+              <div class="flex items-center gap-4">
+                <select
+                  [(ngModel)]="nuevaValoracion"
+                  class="bg-neutral-700 text-white rounded px-3 py-2 border border-neutral-600 focus:border-blue-500 focus:outline-none"
+                >
+                  <option *ngFor="let v of [1,2,3,4,5]" [value]="v">{{v}} estrella{{v > 1 ? 's' : ''}}</option>
+                </select>
+                <span class="text-amber-400 text-xl">{{getStars(nuevaValoracion)}}</span>
+              </div>
+            </div>
+
+            <div class="flex gap-3">
+              <button
+                (click)="guardarReview()"
+                class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors"
+              >
+                Guardar cambios
+              </button>
+              <button
+                (click)="mostrandoFormulario = false"
+                class="px-4 py-2 bg-neutral-600 hover:bg-neutral-700 text-white rounded transition-colors"
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
         </div>
       </article>
     </div>
   </div>
 
-  <!-- Formulario para escribir/editar reseña -->
-  <div *ngIf="mostrandoFormulario" class="mt-8 p-6 bg-neutral-800 rounded-lg border border-white border-opacity-10">
-    <h3 class="text-xl font-semibold mb-4">
-      {{ miReview ? 'Editar tu reseña' : 'Escribe una reseña' }}
-    </h3>
+  <!-- Formulario para escribir nueva reseña (solo si no tienes una) -->
+  <div *ngIf="!miReview && mostrandoFormulario" class="mt-8 p-6 bg-neutral-800 rounded-lg border border-white border-opacity-10">
+    <h3 class="text-xl font-semibold mb-4">Escribe una reseña</h3>
     
     <div class="mb-4">
       <label class="block text-sm font-medium mb-2">Tu opinión:</label>
@@ -139,7 +184,7 @@
         (click)="guardarReview()"
         class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors"
       >
-        {{ miReview ? 'Actualizar reseña' : 'Publicar reseña' }}
+        Publicar reseña
       </button>
       <button
         (click)="cancelarEdicion()"
