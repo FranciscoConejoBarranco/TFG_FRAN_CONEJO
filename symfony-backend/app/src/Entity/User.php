@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -46,6 +47,55 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\JoinColumn(nullable: false)]
     private ?Estado $estado = null;
 
+    /**
+     * @var Collection<int, Review>
+     */
+    #[ORM\OneToMany(targetEntity: Review::class, mappedBy: 'usuario')]
+    private Collection $reviews;
+
+    /**
+     * @var Collection<int, ListaLectura>
+     */
+    #[ORM\OneToMany(mappedBy: 'usuario', targetEntity: ListaLectura::class)]
+    private Collection $listasLectura;
+
+
+    public function __construct()
+    {
+        $this->reviews = new ArrayCollection();
+        $this->listasLectura = new ArrayCollection();
+    }
+
+
+    /**
+     * @return Collection<int, ListaLectura>
+     */
+
+    public function getListasLectura(): Collection
+    {
+        return $this->listasLectura;
+    }
+
+    public function addListaLectura(ListaLectura $listaLectura): static
+    {
+        if (!$this->listasLectura->contains($listaLectura)) {
+            $this->listasLectura->add($listaLectura);
+            $listaLectura->setUsuario($this);
+        }
+
+        return $this;
+    }
+
+    public function removeListaLectura(ListaLectura $listaLectura): static
+    {
+        if ($this->listasLectura->removeElement($listaLectura)) {
+            if ($listaLectura->getUsuario() === $this) {
+                $listaLectura->setUsuario(null);
+            }
+        }
+
+        return $this;
+    }
 
 
     public function getId(): ?int
@@ -175,5 +225,33 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->roles;
     }
 
+    /**
+     * @return Collection<int, Review>
+     */
+    public function getReviews(): Collection
+    {
+        return $this->reviews;
+    }
 
+    public function addReview(Review $review): static
+    {
+        if (!$this->reviews->contains($review)) {
+            $this->reviews->add($review);
+            $review->setUsuario($this);
+        }
+
+        return $this;
+    }
+
+    public function removeReview(Review $review): static
+    {
+        if ($this->reviews->removeElement($review)) {
+            // set the owning side to null (unless already changed)
+            if ($review->getUsuario() === $this) {
+                $review->setUsuario(null);
+            }
+        }
+
+        return $this;
+    }
 }

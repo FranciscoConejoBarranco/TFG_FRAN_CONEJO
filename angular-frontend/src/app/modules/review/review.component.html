@@ -6,7 +6,7 @@
       class="px-8 py-3 text-base bg-blue-600 rounded-lg cursor-pointer border-[none] text-[white] hover:bg-blue-700"
       (click)="escribirResena()"
     >
-      Escribir reseña
+      {{ miReview ? 'Editar mi reseña' : 'Escribir reseña' }}
     </button>
   </div>
 
@@ -18,21 +18,73 @@
     </div>
 
     <div class="flex-1">
+      <!-- Mensaje cuando no hay reviews -->
+      <div *ngIf="reviews.length === 0" class="text-center py-12">
+        <div class="text-neutral-400 text-lg mb-4">Aún no hay reseñas para este libro.</div>
+        <div class="text-neutral-500 text-sm">¡Sé el primero en compartir tu opinión!</div>
+      </div>
+
+      <!-- Lista de reviews -->
       <article
         *ngFor="let review of reviews"
         class="px-0 py-6 border-b border-solid border-b-white border-opacity-10"
       >
         <div class="flex gap-4 items-center mb-4">
           <div>
-            <h3 class="font-bold">{{review.user}}</h3>
+            <h3 class="font-bold">Usuario {{review.usuarioId}}</h3>
             <div class="flex gap-2 items-center">
-              <span class="text-amber-400">{{getStars(review.rating)}}</span>
-              <time class="text-sm text-neutral-400">{{review.date}}</time>
+              <span class="text-amber-400">{{getStars(review.valoracion)}}</span>
+              <time class="text-sm text-neutral-400">{{review.fecha}}</time>
             </div>
           </div>
         </div>
-        <p class="leading-relaxed">{{review.comment}}</p>
+        <p class="leading-relaxed">{{review.contenido}}</p>
       </article>
+    </div>
+  </div>
+
+  <!-- Formulario para escribir/editar reseña -->
+  <div *ngIf="mostrandoFormulario" class="mt-8 p-6 bg-neutral-800 rounded-lg border border-white border-opacity-10">
+    <h3 class="text-xl font-semibold mb-4">
+      {{ miReview ? 'Editar tu reseña' : 'Escribe una reseña' }}
+    </h3>
+    
+    <div class="mb-4">
+      <label class="block text-sm font-medium mb-2">Tu opinión:</label>
+      <textarea
+        [(ngModel)]="nuevoContenido"
+        rows="4"
+        class="w-full p-3 rounded bg-neutral-700 text-white border border-neutral-600 focus:border-blue-500 focus:outline-none"
+        placeholder="Comparte tu experiencia con este libro..."
+      ></textarea>
+    </div>
+
+    <div class="mb-4">
+      <label class="block text-sm font-medium mb-2">Valoración:</label>
+      <div class="flex items-center gap-4">
+        <select
+          [(ngModel)]="nuevaValoracion"
+          class="bg-neutral-700 text-white rounded px-3 py-2 border border-neutral-600 focus:border-blue-500 focus:outline-none"
+        >
+          <option *ngFor="let v of [1,2,3,4,5]" [value]="v">{{v}} estrella{{v > 1 ? 's' : ''}}</option>
+        </select>
+        <span class="text-amber-400 text-xl">{{getStars(nuevaValoracion)}}</span>
+      </div>
+    </div>
+
+    <div class="flex gap-4">
+      <button
+        (click)="guardarReview()"
+        class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors"
+      >
+        {{ miReview ? 'Actualizar reseña' : 'Publicar reseña' }}
+      </button>
+      <button
+        (click)="cancelarEdicion()"
+        class="px-6 py-2 bg-neutral-600 hover:bg-neutral-700 text-white rounded transition-colors"
+      >
+        Cancelar
+      </button>
     </div>
   </div>
 </section>
