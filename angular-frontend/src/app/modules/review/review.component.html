@@ -122,12 +122,6 @@
             <div class="mb-4">
               <label class="block text-sm font-medium mb-2 text-blue-300">Valoración:</label>
               <div class="flex items-center gap-4">
-                <select
-                  [(ngModel)]="nuevaValoracion"
-                  class="bg-neutral-700 text-white rounded px-3 py-2 border border-neutral-600 focus:border-blue-500 focus:outline-none"
-                >
-                  <option *ngFor="let v of [1,2,3,4,5]" [value]="v">{{v}} estrella{{v > 1 ? 's' : ''}}</option>
-                </select>
                 <span class="text-amber-400 text-xl">{{getStars(nuevaValoracion)}}</span>
               </div>
             </div>

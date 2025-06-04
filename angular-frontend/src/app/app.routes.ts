@@ -25,7 +25,7 @@ export const routes: Routes = [
     {path: "mislistas", component: MislistasComponent},
     {path: "perfil", component: PerfilComponent},
     {path: "reviews", component: ReviewsComponent},
-    {path: "recomendados", component: RecomendadosComponent},
+    // {path: "recomendados", component: RecomendadosComponent},
     {path: "gestionlibros", component: GestionlibrosComponent},
     {path: "gestionreviews", component: GestionreviewsComponent},
     {path: "gestionusuarios", component: GestionusuariosComponent},

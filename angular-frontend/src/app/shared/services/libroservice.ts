@@ -23,4 +23,13 @@ export class LibroService {
       })
     );
   }
+
+  libroPorId(id: number): Observable<LibroInterface> {
+    return this.http.get<LibroInterface>(`${this.baseUrl}/${id}`).pipe(
+      catchError((error) => {
+        console.error('Error al obtener libro por ID:', error);
+        return throwError(() => error);
+      })
+    );
+  }
 }

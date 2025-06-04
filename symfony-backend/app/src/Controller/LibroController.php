@@ -115,4 +115,35 @@ class LibroController extends AbstractController
 
         return $titulo;
     }
+
+    #[Route('/libros', name: 'listar_libros', methods: ['GET'])]
+    public function listarLibros(EntityManagerInterface $em): JsonResponse
+    {
+        try {
+            $libros = $em->getRepository(Libro::class)->findAll();
+
+            // ✅ USAR GRUPOS DE SERIALIZACIÓN
+            return $this->json($libros, 200, [], ['groups' => ['libro:read']]);
+        } catch (\Exception $e) {
+            error_log('Error al listar libros: ' . $e->getMessage());
+            return new JsonResponse(['error' => 'Error interno del servidor'], 500);
+        }
+    }
+    #[Route('/libros/{id}', name: 'obtener_libro', methods: ['GET'])]
+    public function obtenerLibro(int $id, EntityManagerInterface $em): JsonResponse
+    {
+        try {
+            $libro = $em->getRepository(Libro::class)->find($id);
+
+            if (!$libro) {
+                return new JsonResponse(['error' => 'Libro no encontrado'], 404);
+            }
+
+            // ✅ USAR GRUPOS DE SERIALIZACIÓN
+            return $this->json($libro, 200, [], ['groups' => ['libro:read']]);
+        } catch (\Exception $e) {
+            error_log('Error al obtener libro: ' . $e->getMessage());
+            return new JsonResponse(['error' => 'Error interno del servidor'], 500);
+        }
+    }
 }
