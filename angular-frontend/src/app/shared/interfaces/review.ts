@@ -1,6 +1,14 @@
-export interface Resena {
-  user: string;
-  rating: number;
-  date: string;
-  comment: string;
+export interface ReviewInterface {
+  id: number;
+  contenido: string;
+  valoracion: number;
+  usuarioId: number;
+  fecha: string;
+}
+
+
+export interface ReviewsPorLibroResponse {
+  reviews: ReviewInterface[];
+  miReview: ReviewInterface | null;
+  pagination: any;
 }

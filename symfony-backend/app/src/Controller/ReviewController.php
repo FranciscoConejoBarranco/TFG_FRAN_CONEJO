@@ -92,61 +92,81 @@ class ReviewController extends AbstractController
     }
 
     #[Route('api/libro/{id}/reviews', name: 'reviews_por_libro', methods: ['GET'])]
-    public function listarReviewsPorLibro(
-        int $id,
-        Request $request,
-        EntityManagerInterface $em
-    ): JsonResponse {
-        $libro = $em->getRepository(Libro::class)->find($id);
-        if (!$libro) {
-            return $this->json(['message' => 'Libro no encontrado.'], 404);
-        }
-
-        // Parámetros de paginación
-        $page = max(1, (int) $request->query->get('page', 1));
-        $limit = min(50, max(5, (int) $request->query->get('limit', 10))); // Entre 5 y 50
-        $offset = ($page - 1) * $limit;
-
-        // Obtener reviews con paginación
-        $queryBuilder = $em->getRepository(Review::class)
-            ->createQueryBuilder('r')
-            ->where('r.libro = :libro')
-            ->setParameter('libro', $libro)
-            ->orderBy('r.fechaCreacion', 'DESC') // Más recientes primero
-            ->setFirstResult($offset)
-            ->setMaxResults($limit);
-
-        $reviews = $queryBuilder->getQuery()->getResult();
-
-        // Contar total de reviews
-        $totalQuery = $em->getRepository(Review::class)
-            ->createQueryBuilder('r')
-            ->select('COUNT(r.id)')
-            ->where('r.libro = :libro')
-            ->setParameter('libro', $libro);
-
-        $total = (int) $totalQuery->getQuery()->getSingleScalarResult();
-
-        $resultado = array_map(function (Review $review) {
-            return [
-                'id' => $review->getId(),
-                'contenido' => $review->getContenido(),
-                'valoracion' => $review->getValoracion(),
-                'usuarioId' => $review->getUsuario()?->getId(),
-                'fecha' => $review->getFechaCreacion()?->format('Y-m-d H:i'),
-            ];
-        }, $reviews);
-
-        return $this->json([
-            'reviews' => $resultado,
-            'pagination' => [
-                'currentPage' => $page,
-                'totalPages' => ceil($total / $limit),
-                'totalReviews' => $total,
-                'limit' => $limit,
-                'hasNext' => $page < ceil($total / $limit),
-                'hasPrevious' => $page > 1
-            ]
-        ]);
+public function listarReviewsPorLibro(
+    int $id,
+    Request $request,
+    EntityManagerInterface $em
+): JsonResponse {
+    $libro = $em->getRepository(Libro::class)->find($id);
+    if (!$libro) {
+        return $this->json(['message' => 'Libro no encontrado.'], 404);
     }
+
+    // Parámetros de paginación
+    $page = max(1, (int) $request->query->get('page', 1));
+    $limit = min(50, max(5, (int) $request->query->get('limit', 10))); // Entre 5 y 50
+    $offset = ($page - 1) * $limit;
+
+    // Obtener reviews con paginación
+    $queryBuilder = $em->getRepository(Review::class)
+        ->createQueryBuilder('r')
+        ->where('r.libro = :libro')
+        ->setParameter('libro', $libro)
+        ->orderBy('r.fechaCreacion', 'DESC')
+        ->setFirstResult($offset)
+        ->setMaxResults($limit);
+
+    $reviews = $queryBuilder->getQuery()->getResult();
+
+    // Contar total de reviews
+    $totalQuery = $em->getRepository(Review::class)
+        ->createQueryBuilder('r')
+        ->select('COUNT(r.id)')
+        ->where('r.libro = :libro')
+        ->setParameter('libro', $libro);
+
+    $total = (int) $totalQuery->getQuery()->getSingleScalarResult();
+
+    // Obtener la review del usuario autenticado
+    $usuario = $this->getUser();
+    $miReview = null;
+    if ($usuario) {
+        $reviewUsuario = $em->getRepository(Review::class)->findOneBy([
+            'usuario' => $usuario,
+            'libro' => $libro
+        ]);
+        if ($reviewUsuario) {
+            $miReview = [
+                'id' => $reviewUsuario->getId(),
+                'contenido' => $reviewUsuario->getContenido(),
+                'valoracion' => $reviewUsuario->getValoracion(),
+                'usuarioId' => $reviewUsuario->getUsuario()?->getId(),
+                'fecha' => $reviewUsuario->getFechaCreacion()?->format('Y-m-d H:i'),
+            ];
+        }
+    }
+
+    $resultado = array_map(function (Review $review) {
+        return [
+            'id' => $review->getId(),
+            'contenido' => $review->getContenido(),
+            'valoracion' => $review->getValoracion(),
+            'usuarioId' => $review->getUsuario()?->getId(),
+            'fecha' => $review->getFechaCreacion()?->format('Y-m-d H:i'),
+        ];
+    }, $reviews);
+
+    return $this->json([
+        'reviews' => $resultado,
+        'miReview' => $miReview,
+        'pagination' => [
+            'currentPage' => $page,
+            'totalPages' => ceil($total / $limit),
+            'totalReviews' => $total,
+            'limit' => $limit,
+            'hasNext' => $page < ceil($total / $limit),
+            'hasPrevious' => $page > 1
+        ]
+    ]);
+}
 }

@@ -24,22 +24,61 @@
         <div class="text-neutral-500 text-sm">¡Sé el primero en compartir tu opinión!</div>
       </div>
 
-      <!-- Lista de reviews -->
+      <!-- Lista de TODAS las reviews, resaltando la tuya -->
       <article
-        *ngFor="let review of reviews"
-        class="px-0 py-6 border-b border-solid border-b-white border-opacity-10"
-      >
-        <div class="flex gap-4 items-center mb-4">
-          <div>
-            <h3 class="font-bold">Usuario {{review.usuarioId}}</h3>
-            <div class="flex gap-2 items-center">
-              <span class="text-amber-400">{{getStars(review.valoracion)}}</span>
-              <time class="text-sm text-neutral-400">{{review.fecha}}</time>
-            </div>
-          </div>
+  *ngFor="let review of reviews"
+  class="px-4 py-6 border-b border-solid border-b-white border-opacity-10 transition-all duration-200 hover:bg-neutral-800/30 rounded-lg mb-2"
+  [ngClass]="{
+    'bg-blue-900/20 border-l-4 border-l-blue-500 shadow-md pl-6 hover:bg-blue-900/25': miReview && review.id === miReview.id,
+    'bg-neutral-800/20 border-l-2 border-l-neutral-600 hover:border-l-neutral-500': !(miReview && review.id === miReview.id)
+  }"
+>
+  <div class="flex gap-4 items-start mb-4">
+    <!-- Avatar para todas las reseñas -->
+    <div class="flex-shrink-0">
+      <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-lg"
+           [ngClass]="{
+             'bg-gradient-to-br from-blue-500 to-blue-700': miReview && review.id === miReview.id,
+             'bg-gradient-to-br from-gray-600 to-gray-800': !(miReview && review.id === miReview.id)
+           }">
+        {{ miReview && review.id === miReview.id ? 'TÚ' : 'U' }}
+      </div>
+    </div>
+
+    <div class="flex-1">
+      <div class="flex items-center gap-2 mb-2">
+        <h3 class="font-bold text-lg"
+            [ngClass]="{
+              'text-blue-400': miReview && review.id === miReview.id,
+              'text-neutral-100': !(miReview && review.id === miReview.id)
+            }">
+          {{ miReview && review.id === miReview.id ? "Tu reseña" : "Usuario " + review.usuarioId }}
+        </h3>
+      </div>
+
+      <div class="flex gap-3 items-center">
+        <div class="flex items-center gap-1">
+          <span class="text-amber-400 text-lg drop-shadow-sm">{{ getStars(review.valoracion) }}</span>
+          <span class="text-sm text-neutral-400 font-medium">({{ review.valoracion }}/5)</span>
         </div>
-        <p class="leading-relaxed">{{review.contenido}}</p>
-      </article>
+        <time class="text-xs text-neutral-400 bg-neutral-800/60 px-2 py-1 rounded-full">
+          {{ review.fecha }}
+        </time>
+      </div>
+    </div>
+  </div>
+
+  <div class="ml-14">
+    <p class="leading-relaxed p-4 rounded-lg"
+       [ngClass]="{
+         'text-blue-50 bg-blue-900/15 border-l-2 border-l-blue-400': miReview && review.id === miReview.id,
+         'text-neutral-200 bg-neutral-800/40 border-l-2 border-l-neutral-600': !(miReview && review.id === miReview.id)
+       }">
+      {{ review.contenido }}
+    </p>
+  </div>
+</article>
+
     </div>
   </div>
 

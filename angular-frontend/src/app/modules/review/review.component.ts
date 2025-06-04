@@ -1,4 +1,10 @@
-import { Component, Input, OnInit, OnChanges, SimpleChanges } from '@angular/core';
+import {
+  Component,
+  Input,
+  OnInit,
+  OnChanges,
+  SimpleChanges,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ReviewService } from '../../shared/services/review.service';
@@ -9,7 +15,7 @@ import { ReviewInterface } from '../../shared/interfaces/review.interface';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './review.component.html',
-  styleUrl: './review.component.css'
+  styleUrl: './review.component.css',
 })
 export class ReviewComponent implements OnInit, OnChanges {
   @Input() libroId!: number; // Recibe el ID del libro desde el padre
@@ -43,27 +49,29 @@ export class ReviewComponent implements OnInit, OnChanges {
 
   cargarReviews(page: number = this.currentPage): void {
     this.loading = true;
-    this.reviewService.obtenerReviewsPorLibro(this.libroId, page, 10).subscribe({
-      next: (response) => {
-        this.reviews = response.reviews;
-        this.currentPage = response.pagination.currentPage;
-        this.totalPages = response.pagination.totalPages;
-        this.totalReviewsCount = response.pagination.totalReviews;
-        
-        const usuarioId = Number(localStorage.getItem('usuarioId'));
-        this.miReview = this.reviews.find((r) => r.usuarioId === usuarioId) || null;
-        if (this.miReview) {
-          this.nuevoContenido = this.miReview.contenido;
-          this.nuevaValoracion = this.miReview.valoracion;
-        }
-        this.loading = false;
-      },
-      error: () => {
-        this.reviews = [];
-        this.loading = false;
-      },
-    });
+    this.reviewService
+      .obtenerReviewsPorLibro(this.libroId, page, 10)
+      .subscribe({
+        next: (response) => {
+          this.reviews = response.reviews;
+          this.currentPage = response.pagination.currentPage;
+          this.totalPages = response.pagination.totalPages;
+          this.totalReviewsCount = response.pagination.totalReviews;
+  
+          this.miReview = response.miReview || null;
+          if (this.miReview) {
+            this.nuevoContenido = this.miReview.contenido;
+            this.nuevaValoracion = this.miReview.valoracion;
+          }
+          this.loading = false;
+        },
+        error: () => {
+          this.reviews = [];
+          this.loading = false;
+        },
+      });
   }
+  
 
   // Métodos de navegación
   siguientePagina(): void {
@@ -88,8 +96,13 @@ export class ReviewComponent implements OnInit, OnChanges {
   get averageRating(): string {
     if (this.totalReviewsCount === 0) return '0.0';
     // Por simplicidad, calculamos con las reviews de la página actual
-    const sum = this.reviews.reduce((total, review) => total + review.valoracion, 0);
-    return this.reviews.length > 0 ? (sum / this.reviews.length).toFixed(1) : '0.0';
+    const sum = this.reviews.reduce(
+      (total, review) => total + review.valoracion,
+      0
+    );
+    return this.reviews.length > 0
+      ? (sum / this.reviews.length).toFixed(1)
+      : '0.0';
   }
 
   // Obtiene el número total de reseñas
@@ -99,20 +112,20 @@ export class ReviewComponent implements OnInit, OnChanges {
 
   // Convierte la calificación numérica en estrellas
   getStars(rating: number): string {
-    let stars = "";
+    let stars = '';
     const fullStars = Math.floor(rating);
     const halfStar = rating % 1 >= 0.5;
-    
+
     // Añadir estrellas completas
     for (let i = 0; i < fullStars; i++) {
-      stars += "★";
+      stars += '★';
     }
-    
+
     // Añadir media estrella si corresponde
     if (halfStar) {
-      stars += "½";
+      stars += '½';
     }
-    
+
     return stars;
   }
 
@@ -154,7 +167,9 @@ export class ReviewComponent implements OnInit, OnChanges {
           error: (error) => {
             console.error('Error completo:', error);
             if (error.status === 422) {
-              alert('Error de validación: Revisa que todos los campos sean correctos');
+              alert(
+                'Error de validación: Revisa que todos los campos sean correctos'
+              );
             } else {
               alert('Error al actualizar la review');
             }
@@ -174,8 +189,12 @@ export class ReviewComponent implements OnInit, OnChanges {
           },
           error: (error) => {
             console.error('Error completo:', error);
-            if (error.status === 422) {
-              alert('Error de validación: Revisa que todos los campos sean correctos');
+            if (error.status === 409) {
+              alert('Ya tienes una review creada para este libro.');
+            } else if (error.status === 422) {
+              alert(
+                'Error de validación: Revisa que todos los campos sean correctos'
+              );
             } else {
               alert('Error al crear la review');
             }

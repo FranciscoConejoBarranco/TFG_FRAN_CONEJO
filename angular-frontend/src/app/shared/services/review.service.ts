@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from '../../../environment/environment';
 import { ReviewInterface } from '../interfaces/review.interface';
+// import { ReviewsPorLibroResponse } from '../interfaces/review';
 
 @Injectable({
   providedIn: 'root',
@@ -76,12 +77,12 @@ export class ReviewService {
     libroId: number,
     page: number = 1,
     limit: number = 10
-  ): Observable<{ reviews: ReviewInterface[]; pagination: any }> {
+  ): Observable<{ reviews: ReviewInterface[]; miReview: ReviewInterface | null; pagination: any }> {
     const params = new HttpParams()
       .set('page', page.toString())
       .set('limit', limit.toString());
-
-    return this._http.get<{ reviews: ReviewInterface[]; pagination: any }>(
+  
+    return this._http.get<{ reviews: ReviewInterface[]; miReview: ReviewInterface | null; pagination: any }>(
       `${environment.api}api/libro/${libroId}/reviews`,
       {
         params,
@@ -89,6 +90,7 @@ export class ReviewService {
       }
     );
   }
+  
 
   /**
    * Método legacy para compatibilidad (carga solo la primera página)
