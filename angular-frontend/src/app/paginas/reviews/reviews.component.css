@@ -1,0 +1,32 @@
+/* Forzar flechas blancas con mayor especificidad */
+::ng-deep .mat-mdc-paginator .mat-mdc-icon-button .mat-mdc-button__icon,
+::ng-deep .mat-mdc-paginator .mat-mdc-icon-button mat-icon,
+::ng-deep .mat-mdc-paginator .mat-mdc-icon-button svg {
+  color: white !important;
+  fill: white !important;
+}
+
+::ng-deep .mat-mdc-paginator .mat-mdc-icon-button {
+  color: white !important;
+}
+
+::ng-deep .mat-mdc-paginator .mat-mdc-icon-button:hover {
+  background-color: #1a1a1a !important;
+}
+
+::ng-deep .mat-mdc-paginator .mat-mdc-icon-button:hover .mat-mdc-button__icon,
+::ng-deep .mat-mdc-paginator .mat-mdc-icon-button:hover mat-icon,
+::ng-deep .mat-mdc-paginator .mat-mdc-icon-button:hover svg {
+  color: white !important;
+  fill: white !important;
+}
+
+/* Flecha del selector */
+::ng-deep .mat-mdc-paginator .mat-mdc-select-arrow {
+  color: white !important;
+}
+
+/* Asegurar que todos los iconos sean blancos */
+::ng-deep .mat-mdc-paginator * {
+  color: white !important;
+}

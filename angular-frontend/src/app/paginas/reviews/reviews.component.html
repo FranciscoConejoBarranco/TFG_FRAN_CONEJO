@@ -1,17 +1,185 @@
 <app-navbar-dashboard />
 
-<div class="bg-black min-h-screen text-white overflow-x-hidden max-w-screen px-4 py-10 sm:pl-72">
-  <h1 class="text-3xl font-semibold mb-8">Mis Reseñas</h1>
+<div
+  class="bg-black min-h-screen text-white overflow-x-hidden max-w-screen px-4 py-10 sm:pl-72"
+>
+  <!-- Header con estadísticas -->
+  <div class="mb-8">
+    <h1 class="text-3xl font-semibold mb-2">Mis Reseñas</h1>
+    <p class="text-neutral-400">
+      <span class="font-medium text-white">{{ totalReviews }}</span> reseñas
+      publicadas
+    </p>
+  </div>
 
-  <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+  <!-- Loading spinner -->
+  <div *ngIf="loading" class="flex justify-center items-center py-20">
+    <mat-spinner diameter="50" color="primary"></mat-spinner>
+  </div>
+
+  <!-- Mensaje cuando no hay reviews -->
+  <div *ngIf="!loading && reviews.length === 0" class="text-center py-20">
+    <div class="bg-neutral-800/30 rounded-xl p-8 max-w-md mx-auto">
+      <mat-icon class="text-6xl text-neutral-500 mb-4">rate_review</mat-icon>
+      <h3 class="text-xl font-medium text-neutral-300 mb-2">
+        No has escrito ninguna reseña
+      </h3>
+      <p class="text-neutral-500 text-sm">
+        ¡Comienza a compartir tus opiniones sobre los libros!
+      </p>
+    </div>
+  </div>
+
+  <!-- Grid de reviews -->
+  <div *ngIf="!loading && reviews.length > 0" class="space-y-8">
+    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <div
+        *ngFor="let review of reviews"
+        class="bg-[#1c1c1c] rounded-xl p-5 shadow-lg hover:shadow-xl transition-all duration-300 border border-neutral-800/50 hover:border-neutral-700/50"
+      >
+        <!-- Header con imagen del libro -->
+        <div class="flex gap-4 mb-4">
+          <img
+            [src]="review.libro.imagen"
+            [alt]="review.libro.titulo"
+            class="w-12 h-16 object-cover rounded-lg shadow-md flex-shrink-0"
+            onerror="this.src='/assets/book-placeholder.jpg'"
+          />
+          <div class="flex-1 min-w-0">
+            <h2 class="text-lg font-bold mb-1 text-blue-400 truncate">
+              {{ review.libro.titulo }}
+            </h2>
+            <p class="text-neutral-400 text-sm truncate">
+              por {{ review.libro.autor }}
+            </p>
+          </div>
+        </div>
+
+        <!-- Valoración -->
+        <div class="flex items-center gap-2 mb-3">
+          <span class="text-amber-400 text-lg">{{
+            getStars(review.valoracion)
+          }}</span>
+          <span class="text-sm text-neutral-400"
+            >({{ review.valoracion }}/5)</span
+          >
+        </div>
+
+        <!-- Contenido de la reseña -->
+        <div class="mb-4">
+          <p class="text-gray-300 text-sm italic line-clamp-3">
+            "{{ review.contenido }}"
+          </p>
+        </div>
+
+        <!-- Footer con fecha y acciones -->
+        <div
+          class="flex justify-between items-center pt-3 border-t border-neutral-700/50"
+        >
+          <p class="text-xs text-gray-500">
+            {{ review.fecha }}
+          </p>
+
+          <div class="flex gap-2">
+            <button
+              mat-icon-button
+              (click)="editarReview(review)"
+              class="text-blue-400 hover:text-blue-300 hover:bg-blue-900/30 transition-colors"
+              title="Editar reseña"
+            >
+              <mat-icon class="text-sm">edit</mat-icon>
+            </button>
+            <button
+              mat-icon-button
+              (click)="eliminarReview(review.id)"
+              class="text-red-400 hover:text-red-300 hover:bg-red-900/30 transition-colors"
+              title="Eliminar reseña"
+            >
+              <mat-icon class="text-sm">delete</mat-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Paginación con Angular Material -->
+    <!-- Paginación con clases Tailwind directas -->
+    <div class="flex justify-center mt-8">
+      <mat-paginator
+        [length]="totalReviews"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="pageSizeOptions"
+        [pageIndex]="currentPage - 1"
+        (page)="onPageChange($event)"
+        showFirstLastButtons
+        class="!bg-black !text-white border border-gray-700 rounded-lg"
+        style="background-color: black !important; color: white !important"
+      >
+      </mat-paginator>
+    </div>
+  </div>
+
+  <!-- Modal de edición inline - SIN selector de estrellas -->
+  <div
+    *ngIf="editandoReview"
+    class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+  >
     <div
-      *ngFor="let resena of resenas"
-      class="bg-[#1c1c1c] rounded-xl p-5 shadow-md hover:scale-[1.02] transition-transform"
+      class="bg-neutral-900 rounded-xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-neutral-700"
     >
-      <h2 class="text-lg font-bold mb-2">{{ resena.tituloLibro }}</h2>
-      <p class="text-gray-400 text-sm mb-2">Puntuación: {{ resena.puntuacion }}/5</p>
-      <p class="text-gray-300 text-sm italic mb-4">“{{ resena.comentario }}”</p>
-      <p class="text-xs text-gray-500 text-right">Publicado el {{ resena.fecha }}</p>
+      <h3 class="text-xl font-semibold mb-4 text-blue-400">
+        Editar reseña de "{{ editandoReview.libro.titulo }}"
+      </h3>
+
+      <div class="mb-4">
+        <label class="block text-sm font-medium mb-2 text-neutral-300"
+          >Tu opinión:</label
+        >
+        <textarea
+          [(ngModel)]="editandoReview.contenido"
+          rows="5"
+          class="w-full p-3 rounded-lg bg-neutral-800 text-white border border-neutral-600 focus:border-blue-500 focus:outline-none transition-colors"
+          placeholder="Actualiza tu experiencia..."
+        ></textarea>
+      </div>
+
+      <!-- Mostrar valoración actual (solo lectura) -->
+      <div class="mb-6">
+        <label class="block text-sm font-medium mb-2 text-neutral-300"
+          >Valoración actual:</label
+        >
+        <div
+          class="flex items-center gap-2 p-3 bg-neutral-800/50 rounded-lg border border-neutral-600/50"
+        >
+          <span class="text-amber-400 text-xl">{{
+            getStars(editandoReview.valoracion)
+          }}</span>
+          <span class="text-neutral-400"
+            >({{ editandoReview.valoracion }}/5)</span
+          >
+          <span class="text-neutral-500 text-sm ml-2"
+            >- No se puede modificar</span
+          >
+        </div>
+      </div>
+
+      <div class="flex gap-3 justify-end">
+        <button
+          mat-button
+          (click)="cancelarEdicion()"
+          class="px-6 py-2 text-neutral-400 hover:text-white transition-colors"
+        >
+          Cancelar
+        </button>
+        <button
+          mat-raised-button
+          color="primary"
+          (click)="guardarEdicion()"
+          class="px-6 py-2"
+        >
+          Guardar cambios
+        </button>
+      </div>
     </div>
   </div>
 </div>

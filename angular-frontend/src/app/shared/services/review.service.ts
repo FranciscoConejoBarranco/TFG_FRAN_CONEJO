@@ -77,20 +77,24 @@ export class ReviewService {
     libroId: number,
     page: number = 1,
     limit: number = 10
-  ): Observable<{ reviews: ReviewInterface[]; miReview: ReviewInterface | null; pagination: any }> {
+  ): Observable<{
+    reviews: ReviewInterface[];
+    miReview: ReviewInterface | null;
+    pagination: any;
+  }> {
     const params = new HttpParams()
       .set('page', page.toString())
       .set('limit', limit.toString());
-  
-    return this._http.get<{ reviews: ReviewInterface[]; miReview: ReviewInterface | null; pagination: any }>(
-      `${environment.api}api/libro/${libroId}/reviews`,
-      {
-        params,
-        withCredentials: true,
-      }
-    );
+
+    return this._http.get<{
+      reviews: ReviewInterface[];
+      miReview: ReviewInterface | null;
+      pagination: any;
+    }>(`${environment.api}api/libro/${libroId}/reviews`, {
+      params,
+      withCredentials: true,
+    });
   }
-  
 
   /**
    * Método legacy para compatibilidad (carga solo la primera página)
@@ -98,6 +102,26 @@ export class ReviewService {
   obtenerReviewsPorLibroSimple(libroId: number): Observable<ReviewInterface[]> {
     return this.obtenerReviewsPorLibro(libroId, 1, 10).pipe(
       map((response) => response.reviews)
+    );
+  }
+
+  /**
+   * Obtiene todas las reviews del usuario autenticado
+   */
+  obtenerMisReviews(
+    page: number = 1,
+    limit: number = 10
+  ): Observable<{ reviews: any[]; pagination: any }> {
+    const params = new HttpParams()
+      .set('page', page.toString())
+      .set('limit', limit.toString());
+
+    return this._http.get<{ reviews: any[]; pagination: any }>(
+      `${environment.api}api/usuario/reviews`,
+      {
+        params,
+        withCredentials: true,
+      }
     );
   }
 }
