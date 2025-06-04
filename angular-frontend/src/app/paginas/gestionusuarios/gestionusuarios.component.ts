@@ -17,12 +17,6 @@ import { MatPaginatorModule, MatPaginator, PageEvent } from '@angular/material/p
 import { MatSortModule, MatSort } from '@angular/material/sort';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import {
-  MatDialogModule,
-  MatDialog,
-  MatDialogRef,
-  MAT_DIALOG_DATA,
-} from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
@@ -31,7 +25,6 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
 import { MatCardModule } from '@angular/material/card';
 import { MatToolbarModule } from '@angular/material/toolbar';
-import { Inject } from '@angular/core';
 
 @Component({
   selector: 'app-gestionusuarios',
@@ -46,7 +39,6 @@ import { Inject } from '@angular/core';
     MatSortModule,
     MatButtonModule,
     MatIconModule,
-    MatDialogModule,
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
@@ -67,7 +59,6 @@ export class GestionusuariosComponent implements OnInit {
   @ViewChild(MatPaginator)
   set matPaginator(paginator: MatPaginator) {
     this._paginator = paginator;
-    // this.dataSource.paginator = this._paginator;
     if (this._paginator) {
       this._paginator.page.subscribe((event) => {
         this.currentPage = event.pageIndex + 1;
@@ -91,7 +82,6 @@ export class GestionusuariosComponent implements OnInit {
   dataSource = new MatTableDataSource<UsuarioInterface>([]);
 
   // Estados del componente
-  // Removed duplicate declaration of 'loading'
   usuarios: UsuarioInterface[] = [];
   rolesDisponibles: string[] = [];
   estadosDisponibles: any[] = [];
@@ -102,19 +92,30 @@ export class GestionusuariosComponent implements OnInit {
   mostrarDialogoEditar = false;
   mostrarDialogoEliminar = false;
 
-  /// Variables de paginación optimizadas
+  // Variables de paginación optimizadas
   currentPage: number = 1;
   totalItems: number = 0;
   itemsPerPage: number = 10;
   loading = true;
 
+  // Formularios para los diálogos
+  usuarioForm: FormGroup;
+  usuarioEditando: UsuarioInterface | null = null;
+
   constructor(
     private usuarioService: UsuarioService,
-    private dialog: MatDialog,
     private snackBar: MatSnackBar,
     private fb: FormBuilder
   ) {
     this.rolesDisponibles = ['ROLE_USER', 'ROLE_SUPERADMIN'];
+    
+    // Inicializar formulario
+    this.usuarioForm = this.fb.group({
+      name: ['', [Validators.required]],
+      email: ['', [Validators.required, Validators.email]],
+      roles: [[]],
+      estado: [''],
+    });
   }
 
   ngOnInit(): void {
@@ -176,7 +177,6 @@ export class GestionusuariosComponent implements OnInit {
     this.itemsPerPage = event.pageSize;
     this.cargarUsuarios();
   }
-  
 
   aplicarFiltro(event: Event): void {
     const filterValue = (event.target as HTMLInputElement).value;
@@ -187,21 +187,32 @@ export class GestionusuariosComponent implements OnInit {
     }
   }
 
+  // Métodos para manejar el diálogo de edición
   editarUsuario(usuario: UsuarioInterface): void {
-    const dialogRef = this.dialog.open(EditarUsuarioDialogComponent, {
-      width: '500px',
-      data: {
-        usuario: { ...usuario },
-        rolesDisponibles: this.rolesDisponibles,
-        estadosDisponibles: this.estadosDisponibles,
-      },
+    this.usuarioEditando = { ...usuario };
+    this.usuarioForm.patchValue({
+      name: usuario.name,
+      email: usuario.email,
+      roles: usuario.roles,
+      estado: usuario.estado,
     });
+    this.mostrarDialogoEditar = true;
+  }
 
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
-        this.actualizarUsuario(usuario.id, result);
-      }
-    });
+  cerrarDialogoEditar(): void {
+    this.mostrarDialogoEditar = false;
+    this.usuarioEditando = null;
+    this.usuarioForm.reset();
+  }
+
+  guardarUsuario(): void {
+    if (this.usuarioForm.valid && this.usuarioEditando) {
+      const formValue = this.usuarioForm.value;
+      // Si el backend espera un array, asegúrate de que 'roles' sea un array:
+      formValue.roles = [formValue.roles];
+      this.actualizarUsuario(this.usuarioEditando.id, formValue);
+      this.cerrarDialogoEditar();
+    }
   }
 
   actualizarUsuario(id: number, datos: Partial<UsuarioInterface>): void {
@@ -219,28 +230,33 @@ export class GestionusuariosComponent implements OnInit {
     });
   }
 
+  // Métodos para manejar el diálogo de eliminación
   eliminarUsuario(usuario: UsuarioInterface): void {
-    const dialogRef = this.dialog.open(ConfirmarEliminacionDialogComponent, {
-      width: '400px',
-      data: { usuario },
-    });
+    this.usuarioSeleccionado = usuario;
+    this.mostrarDialogoEliminar = true;
+  }
 
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
-        this.usuarioService.eliminarUsuario(usuario.id).subscribe({
-          next: (response) => {
-            if (response.estado === 'ok') {
-              this.mostrarMensaje('Usuario eliminado correctamente', 'success');
-              this.cargarUsuarios();
-            }
-          },
-          error: (error) => {
-            console.error('Error al eliminar usuario:', error);
-            this.mostrarMensaje('Error al eliminar usuario', 'error');
-          },
-        });
-      }
-    });
+  cerrarDialogoEliminar(): void {
+    this.mostrarDialogoEliminar = false;
+    this.usuarioSeleccionado = null;
+  }
+
+  confirmarEliminacion(): void {
+    if (this.usuarioSeleccionado) {
+      this.usuarioService.eliminarUsuario(this.usuarioSeleccionado.id).subscribe({
+        next: (response) => {
+          if (response.estado === 'ok') {
+            this.mostrarMensaje('Usuario eliminado correctamente', 'success');
+            this.cargarUsuarios();
+          }
+        },
+        error: (error) => {
+          console.error('Error al eliminar usuario:', error);
+          this.mostrarMensaje('Error al eliminar usuario', 'error');
+        },
+      });
+    }
+    this.cerrarDialogoEliminar();
   }
 
   cambiarRol(usuario: UsuarioInterface, nuevoRol: string): void {
@@ -271,6 +287,10 @@ export class GestionusuariosComponent implements OnInit {
     return this.usuarioService.getNombreRol(roles[0] || 'ROLE_USER');
   }
 
+  getNombreRol(rol: string): string {
+    return this.usuarioService.getNombreRol(rol);
+  }
+
   obtenerColorEstado(estado: string): string {
     const colores: { [key: string]: string } = {
       Verificado: 'bg-green-500',
@@ -297,155 +317,5 @@ export class GestionusuariosComponent implements OnInit {
   refrescarDatos(): void {
     this.cargarUsuarios();
     this.mostrarMensaje('Datos actualizados', 'success');
-  }
-}
-
-// Componente de diálogo para editar usuario
-@Component({
-  selector: 'app-editar-usuario-dialog',
-  template: `
-    <h2 mat-dialog-title class="text-xl font-semibold mb-4">Editar Usuario</h2>
-    <mat-dialog-content class="min-w-96">
-      <form [formGroup]="usuarioForm" class="space-y-4">
-        <mat-form-field appearance="fill" class="w-full">
-          <mat-label>Nombre</mat-label>
-          <input
-            matInput
-            formControlName="name"
-            placeholder="Nombre del usuario"
-          />
-          <mat-error *ngIf="usuarioForm.get('name')?.hasError('required')">
-            El nombre es requerido
-          </mat-error>
-        </mat-form-field>
-
-        <mat-form-field appearance="fill" class="w-full">
-          <mat-label>Email</mat-label>
-          <input
-            matInput
-            formControlName="email"
-            type="email"
-            placeholder="correo@ejemplo.com"
-          />
-          <mat-error *ngIf="usuarioForm.get('email')?.hasError('required')">
-            El email es requerido
-          </mat-error>
-          <mat-error *ngIf="usuarioForm.get('email')?.hasError('email')">
-            Email inválido
-          </mat-error>
-        </mat-form-field>
-
-        <mat-form-field appearance="fill" class="w-full">
-          <mat-label>Rol</mat-label>
-          <mat-select formControlName="roles">
-            <mat-option
-              *ngFor="let rol of data.rolesDisponibles"
-              [value]="[rol]"
-            >
-              {{ getNombreRol(rol) }}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
-      </form>
-    </mat-dialog-content>
-    <mat-dialog-actions align="end" class="gap-2">
-      <button mat-button (click)="onNoClick()" class="text-gray-600">
-        Cancelar
-      </button>
-      <button
-        mat-raised-button
-        color="primary"
-        [disabled]="!usuarioForm.valid"
-        (click)="onSave()"
-      >
-        Guardar
-      </button>
-    </mat-dialog-actions>
-  `,
-  standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    ReactiveFormsModule,
-    MatDialogModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
-    MatButtonModule,
-  ],
-})
-export class EditarUsuarioDialogComponent {
-  usuarioForm: FormGroup;
-
-  constructor(
-    public dialogRef: MatDialogRef<EditarUsuarioDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: any,
-    private fb: FormBuilder,
-    private usuarioService: UsuarioService
-  ) {
-    this.usuarioForm = this.fb.group({
-      name: [data.usuario.name, [Validators.required]],
-      email: [data.usuario.email, [Validators.required, Validators.email]],
-      roles: [data.usuario.roles],
-      estado: [data.usuario.estado],
-    });
-  }
-
-  onNoClick(): void {
-    this.dialogRef.close();
-  }
-
-  onSave(): void {
-    if (this.usuarioForm.valid) {
-      this.dialogRef.close(this.usuarioForm.value);
-    }
-  }
-
-  getNombreRol(rol: string): string {
-    return this.usuarioService.getNombreRol(rol);
-  }
-}
-
-// Componente de diálogo para confirmar eliminación
-@Component({
-  selector: 'app-confirmar-eliminacion-dialog',
-  template: `
-    <h2 mat-dialog-title class="text-xl font-semibold text-red-600">
-      Confirmar Eliminación
-    </h2>
-    <mat-dialog-content class="py-4">
-      <p class="text-gray-700">
-        ¿Estás seguro de que deseas eliminar al usuario
-        <strong class="text-gray-900">{{ data.usuario.name }}</strong
-        >?
-      </p>
-      <p class="text-red-600 text-sm mt-2 font-medium">
-        ⚠️ Esta acción no se puede deshacer.
-      </p>
-    </mat-dialog-content>
-    <mat-dialog-actions align="end" class="gap-2">
-      <button mat-button (click)="onNoClick()" class="text-gray-600">
-        Cancelar
-      </button>
-      <button mat-raised-button color="warn" (click)="onConfirm()">
-        Eliminar
-      </button>
-    </mat-dialog-actions>
-  `,
-  standalone: true,
-  imports: [CommonModule, MatDialogModule, MatButtonModule],
-})
-export class ConfirmarEliminacionDialogComponent {
-  constructor(
-    public dialogRef: MatDialogRef<ConfirmarEliminacionDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: any
-  ) {}
-
-  onNoClick(): void {
-    this.dialogRef.close();
-  }
-
-  onConfirm(): void {
-    this.dialogRef.close(true);
   }
 }

@@ -289,4 +289,124 @@
       </button>
     </div>
   </main>
+
+  <!-- Modal de Editar Usuario -->
+  <div
+    *ngIf="mostrarDialogoEditar"
+    class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+  >
+    <div
+      class="bg-gray-800 rounded-xl p-6 w-full max-w-md border border-gray-700"
+    >
+      <h2 class="text-xl font-semibold mb-4 text-white">Editar Usuario</h2>
+
+      <form [formGroup]="usuarioForm" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-300 mb-2"
+            >Nombre</label
+          >
+          <input
+            formControlName="name"
+            placeholder="Nombre del usuario"
+            class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
+          />
+          <div
+            *ngIf="usuarioForm.get('name')?.hasError('required')"
+            class="text-red-400 text-sm mt-1"
+          >
+            El nombre es requerido
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-300 mb-2"
+            >Email</label
+          >
+          <input
+            formControlName="email"
+            type="email"
+            placeholder="correo@ejemplo.com"
+            class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
+          />
+          <div
+            *ngIf="usuarioForm.get('email')?.hasError('required')"
+            class="text-red-400 text-sm mt-1"
+          >
+            El email es requerido
+          </div>
+          <div
+            *ngIf="usuarioForm.get('email')?.hasError('email')"
+            class="text-red-400 text-sm mt-1"
+          >
+            Email inválido
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-300 mb-2"
+            >Rol</label
+          >
+          <select
+            formControlName="roles"
+            class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
+          >
+            <option *ngFor="let rol of rolesDisponibles" [value]="rol">
+              {{ getNombreRol(rol) }}
+            </option>
+          </select>
+        </div>
+      </form>
+
+      <div class="flex justify-end gap-3 mt-6">
+        <button
+          (click)="cerrarDialogoEditar()"
+          class="px-4 py-2 text-gray-400 hover:text-white transition-colors"
+        >
+          Cancelar
+        </button>
+        <button
+          (click)="guardarUsuario()"
+          [disabled]="!usuarioForm.valid"
+          class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white px-4 py-2 rounded-lg transition-colors"
+        >
+          Guardar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Confirmar Eliminación -->
+  <div
+    *ngIf="mostrarDialogoEliminar"
+    class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+  >
+    <div
+      class="bg-gray-800 rounded-xl p-6 w-full max-w-md border border-gray-700"
+    >
+      <h2 class="text-xl font-semibold text-red-400 mb-4">
+        Confirmar Eliminación
+      </h2>
+      <div class="mb-6">
+        <p class="text-gray-300">
+          ¿Estás seguro de que deseas eliminar al usuario
+          <span class="font-bold">{{ usuarioSeleccionado?.name }}</span
+          >?
+        </p>
+      </div>
+      <div class="flex justify-end gap-3">
+        <button
+          (click)="cerrarDialogoEliminar()"
+          class="px-4 py-2 text-gray-400 hover:text-white transition-colors"
+        >
+          Cancelar
+        </button>
+        <button
+          (click)="confirmarEliminacion()"
+          class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors"
+        >
+          Eliminar
+        </button>
+      </div>
+    </div>
+  </div>
 </div>
