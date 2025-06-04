@@ -208,4 +208,22 @@ export class ReviewComponent implements OnInit, OnChanges {
     this.nuevoContenido = '';
     this.nuevaValoracion = 5;
   }
+
+
+  eliminarReview(): void {
+    if (!this.miReview) return;
+    
+    if (confirm('¿Estás seguro de que quieres eliminar tu reseña?')) {
+      this.reviewService.eliminarReview(this.miReview.id).subscribe({
+        next: () => {
+          this.cargarReviews();
+          alert('Reseña eliminada correctamente');
+        },
+        error: (error) => {
+          console.error('Error al eliminar:', error);
+          alert('Error al eliminar la reseña');
+        }
+      });
+    }
+  }
 }

@@ -26,59 +26,82 @@
 
       <!-- Lista de TODAS las reviews, resaltando la tuya -->
       <article
-  *ngFor="let review of reviews"
-  class="px-4 py-6 border-b border-solid border-b-white border-opacity-10 transition-all duration-200 hover:bg-neutral-800/30 rounded-lg mb-2"
-  [ngClass]="{
-    'bg-blue-900/20 border-l-4 border-l-blue-500 shadow-md pl-6 hover:bg-blue-900/25': miReview && review.id === miReview.id,
-    'bg-neutral-800/20 border-l-2 border-l-neutral-600 hover:border-l-neutral-500': !(miReview && review.id === miReview.id)
-  }"
->
-  <div class="flex gap-4 items-start mb-4">
-    <!-- Avatar para todas las reseñas -->
-    <div class="flex-shrink-0">
-      <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-lg"
-           [ngClass]="{
-             'bg-gradient-to-br from-blue-500 to-blue-700': miReview && review.id === miReview.id,
-             'bg-gradient-to-br from-gray-600 to-gray-800': !(miReview && review.id === miReview.id)
-           }">
-        {{ miReview && review.id === miReview.id ? 'TÚ' : 'U' }}
-      </div>
-    </div>
+        *ngFor="let review of reviews"
+        class="px-4 py-6 border-b border-solid border-b-white border-opacity-10 transition-all duration-200 hover:bg-neutral-800/30 rounded-lg mb-2"
+        [ngClass]="{
+          'bg-blue-900/20 border-l-4 border-l-blue-500 shadow-md pl-6 hover:bg-blue-900/25': miReview && review.id === miReview.id,
+          'bg-neutral-800/20 border-l-2 border-l-neutral-600 hover:border-l-neutral-500': !(miReview && review.id === miReview.id)
+        }"
+      >
+        <div class="flex gap-4 items-start mb-4">
+          <!-- Avatar para todas las reseñas -->
+          <div class="flex-shrink-0">
+            <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-lg"
+                 [ngClass]="{
+                   'bg-gradient-to-br from-blue-500 to-blue-700': miReview && review.id === miReview.id,
+                   'bg-gradient-to-br from-gray-600 to-gray-800': !(miReview && review.id === miReview.id)
+                 }">
+              {{ miReview && review.id === miReview.id ? 'TÚ' : 'U' }}
+            </div>
+          </div>
 
-    <div class="flex-1">
-      <div class="flex items-center gap-2 mb-2">
-        <h3 class="font-bold text-lg"
-            [ngClass]="{
-              'text-blue-400': miReview && review.id === miReview.id,
-              'text-neutral-100': !(miReview && review.id === miReview.id)
-            }">
-          {{ miReview && review.id === miReview.id ? "Tu reseña" : "Usuario " + review.usuarioId }}
-        </h3>
-      </div>
+          <div class="flex-1">
+            <div class="flex items-center justify-between mb-2">
+              <div class="flex items-center gap-2">
+                <h3 class="font-bold text-lg"
+                    [ngClass]="{
+                      'text-blue-400': miReview && review.id === miReview.id,
+                      'text-neutral-100': !(miReview && review.id === miReview.id)
+                    }">
+                  {{ miReview && review.id === miReview.id ? "Tu reseña" : "Usuario " + review.usuarioId }}
+                </h3>
+              </div>
 
-      <div class="flex gap-3 items-center">
-        <div class="flex items-center gap-1">
-          <span class="text-amber-400 text-lg drop-shadow-sm">{{ getStars(review.valoracion) }}</span>
-          <span class="text-sm text-neutral-400 font-medium">({{ review.valoracion }}/5)</span>
+              <!-- Botones de acción solo para tu reseña -->
+              <div *ngIf="miReview && review.id === miReview.id" class="flex gap-2">
+                <button
+                  (click)="escribirResena()"
+                  class="p-2 text-blue-400 hover:text-blue-300 hover:bg-blue-900/30 rounded-lg transition-all duration-200"
+                  title="Editar reseña"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                  </svg>
+                </button>
+                <button
+                  (click)="eliminarReview()"
+                  class="p-2 text-red-400 hover:text-red-300 hover:bg-red-900/30 rounded-lg transition-all duration-200"
+                  title="Eliminar reseña"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <div class="flex gap-3 items-center">
+              <div class="flex items-center gap-1">
+                <span class="text-amber-400 text-lg drop-shadow-sm">{{ getStars(review.valoracion) }}</span>
+                <span class="text-sm text-neutral-400 font-medium">({{ review.valoracion }}/5)</span>
+              </div>
+              <time class="text-xs text-neutral-400 bg-neutral-800/60 px-2 py-1 rounded-full">
+                {{ review.fecha }}
+              </time>
+            </div>
+          </div>
         </div>
-        <time class="text-xs text-neutral-400 bg-neutral-800/60 px-2 py-1 rounded-full">
-          {{ review.fecha }}
-        </time>
-      </div>
-    </div>
-  </div>
 
-  <div class="ml-14">
-    <p class="leading-relaxed p-4 rounded-lg"
-       [ngClass]="{
-         'text-blue-50 bg-blue-900/15 border-l-2 border-l-blue-400': miReview && review.id === miReview.id,
-         'text-neutral-200 bg-neutral-800/40 border-l-2 border-l-neutral-600': !(miReview && review.id === miReview.id)
-       }">
-      {{ review.contenido }}
-    </p>
-  </div>
-</article>
-
+        <div class="ml-14">
+          <p class="leading-relaxed p-4 rounded-lg"
+             [ngClass]="{
+               'text-blue-50 bg-blue-900/15 border-l-2 border-l-blue-400': miReview && review.id === miReview.id,
+               'text-neutral-200 bg-neutral-800/40 border-l-2 border-l-neutral-600': !(miReview && review.id === miReview.id)
+             }">
+            {{ review.contenido }}
+          </p>
+        </div>
+      </article>
     </div>
   </div>
 
