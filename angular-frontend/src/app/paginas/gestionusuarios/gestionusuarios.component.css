@@ -1,0 +1,53 @@
+/* Estilos personalizados para Angular Material con tema oscuro */
+::ng-deep .mat-mdc-table {
+    background: transparent !important;
+    color: white !important;
+  }
+  
+  ::ng-deep .mat-mdc-header-cell {
+    background: rgb(55 65 81) !important;
+    color: white !important;
+    font-weight: 600 !important;
+  }
+  
+  ::ng-deep .mat-mdc-cell {
+    border-bottom-color: rgb(55 65 81 / 0.5) !important;
+    color: rgb(209 213 219) !important;
+  }
+  
+  ::ng-deep .mat-mdc-row:hover {
+    background: rgb(55 65 81 / 0.3) !important;
+  }
+  
+  ::ng-deep .mat-mdc-paginator {
+    background: transparent !important;
+    color: white !important;
+  }
+  
+  ::ng-deep .mat-mdc-paginator .mat-mdc-select-value,
+  ::ng-deep .mat-mdc-paginator .mat-mdc-paginator-range-label {
+    color: white !important;
+  }
+  
+  ::ng-deep .mat-mdc-form-field {
+    color: white !important;
+  }
+  
+  ::ng-deep .mat-mdc-form-field .mat-mdc-floating-label {
+    color: rgb(156 163 175) !important;
+  }
+  
+  ::ng-deep .mat-mdc-form-field.mat-focused .mat-mdc-floating-label {
+    color: rgb(59 130 246) !important;
+  }
+  
+  ::ng-deep .snackbar-success {
+    background: rgb(34 197 94) !important;
+    color: white !important;
+  }
+  
+  ::ng-deep .snackbar-error {
+    background: rgb(239 68 68) !important;
+    color: white !important;
+  }
+  

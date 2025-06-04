@@ -50,7 +50,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @var Collection<int, Review>
      */
-    #[ORM\OneToMany(targetEntity: Review::class, mappedBy: 'usuario')]
+    #[ORM\OneToMany(targetEntity: Review::class, mappedBy: 'usuario', cascade: ["remove"])]
     private Collection $reviews;
 
     /**

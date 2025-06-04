@@ -17,6 +17,7 @@ use App\Dto\LoginDto;;
 use App\Entity\Estado;
 use App\Entity\User;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mailer\MailerInterface;
@@ -212,12 +213,46 @@ final class UserController extends AbstractController
 
 
     #[Route('auth/users', methods: ['get'])]
-    public function getUsers(): JsonResponse
+    public function getUsers(Request $request): JsonResponse
     {
-        $users = $this->em->getRepository(User::class)->findAll();
+        // Obtener parámetros de paginación
+        $page = max(1, $request->query->getInt('page', 1));
+        $limit = min(100, max(1, $request->query->getInt('limit', 10)));
+
+        // Calcular offset
+        $offset = ($page - 1) * $limit;
+
+        // Crear query builder con paginación
+        $qb = $this->em->createQueryBuilder();
+        $qb->select('u')
+            ->from(User::class, 'u')
+            ->orderBy('u.id', 'DESC')
+            ->setFirstResult($offset)
+            ->setMaxResults($limit);
+
+        // Obtener usuarios paginados
+        $users = $qb->getQuery()->getResult();
+
+        // Contar total de usuarios
+        $totalQb = $this->em->createQueryBuilder();
+        $totalQb->select('COUNT(u.id)')
+            ->from(User::class, 'u');
+        $total = $totalQb->getQuery()->getSingleScalarResult();
+
+        // Calcular total de páginas
+        $totalPages = ceil($total / $limit);
 
         if (empty($users)) {
-            return $this->json(['estado' => 'error', 'mensaje' => 'No hay usuarios registrados'], Response::HTTP_NOT_FOUND);
+            return $this->json([
+                'estado' => 'ok',
+                'data' => [],
+                'pagination' => [
+                    'currentPage' => $page,
+                    'totalPages' => $totalPages,
+                    'totalItems' => $total,
+                    'itemsPerPage' => $limit
+                ]
+            ], Response::HTTP_OK);
         }
 
         $data = array_map(function (User $user) {
@@ -230,6 +265,208 @@ final class UserController extends AbstractController
             ];
         }, $users);
 
-        return $this->json(['estado' => 'ok', 'data' => $data], Response::HTTP_OK);
+        return $this->json([
+            'estado' => 'ok',
+            'data' => $data,
+            'pagination' => [
+                'currentPage' => $page,
+                'totalPages' => $totalPages,
+                'totalItems' => $total,
+                'itemsPerPage' => $limit
+            ]
+        ], Response::HTTP_OK);
+    }
+
+
+
+    #[Route('/auth/users/{id}', methods: ['GET'])]
+    public function getUserById(int $id): JsonResponse
+    {
+        $user = $this->em->getRepository(User::class)->find($id);
+
+        if (!$user) {
+            return $this->json([
+                'estado' => 'error',
+                'mensaje' => 'Usuario no encontrado'
+            ], Response::HTTP_NOT_FOUND);
+        }
+
+        return $this->json([
+            'estado' => 'ok',
+            'data' => [
+                'id' => $user->getId(),
+                'name' => $user->getName(),
+                'email' => $user->getEmail(),
+                'roles' => $user->getRoles(),
+                'estado' => $user->getEstado()->getNombre(),
+            ]
+        ], Response::HTTP_OK);
+    }
+
+    #[Route('/auth/users/{id}', methods: ['PUT'])]
+    public function updateUser(
+        int $id,
+        Request $request,
+        ValidatorInterface $validator
+    ): JsonResponse {
+        $user = $this->em->getRepository(User::class)->find($id);
+
+        if (!$user) {
+            return $this->json([
+                'estado' => 'error',
+                'mensaje' => 'Usuario no encontrado'
+            ], Response::HTTP_NOT_FOUND);
+        }
+
+        $data = json_decode($request->getContent(), true);
+
+        // Validar que se envió data
+        if (!$data) {
+            return $this->json([
+                'estado' => 'error',
+                'mensaje' => 'Datos inválidos'
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+        // Actualizar nombre si se proporciona
+        if (isset($data['name']) && !empty(trim($data['name']))) {
+            $user->setName(trim($data['name']));
+        }
+
+        // Actualizar email si se proporciona
+        if (isset($data['email']) && !empty(trim($data['email']))) {
+            // Verificar que el email no esté siendo usado por otro usuario
+            $existingUser = $this->em->getRepository(User::class)->findOneBy(['email' => $data['email']]);
+            if ($existingUser && $existingUser->getId() !== $user->getId()) {
+                return $this->json([
+                    'estado' => 'error',
+                    'mensaje' => 'El email ya está siendo usado por otro usuario'
+                ], Response::HTTP_BAD_REQUEST);
+            }
+            $user->setEmail(trim($data['email']));
+        }
+
+        // Actualizar roles si se proporciona
+        if (isset($data['roles']) && is_array($data['roles'])) {
+            // Validar roles permitidos
+            $rolesPermitidos = ['ROLE_USER', 'ROLE_ADMIN', 'ROLE_SUPERADMIN'];
+            $rolesValidos = array_intersect($data['roles'], $rolesPermitidos);
+
+            if (empty($rolesValidos)) {
+                $rolesValidos = ['ROLE_USER']; // Rol por defecto
+            }
+
+            $user->setRoles($rolesValidos);
+        }
+
+        // Actualizar estado si se proporciona
+        if (isset($data['estado']) && !empty(trim($data['estado']))) {
+            $estado = $this->em->getRepository(Estado::class)->findOneBy(['nombre' => $data['estado']]);
+            if ($estado) {
+                $user->setEstado($estado);
+            }
+        }
+
+        try {
+            $this->em->flush();
+
+            return $this->json([
+                'estado' => 'ok',
+                'mensaje' => 'Usuario actualizado correctamente',
+                'data' => [
+                    'id' => $user->getId(),
+                    'name' => $user->getName(),
+                    'email' => $user->getEmail(),
+                    'roles' => $user->getRoles(),
+                    'estado' => $user->getEstado()->getNombre(),
+                ]
+            ], Response::HTTP_OK);
+        } catch (\Exception $e) {
+            return $this->json([
+                'estado' => 'error',
+                'mensaje' => 'Error al actualizar usuario: ' . $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    #[Route('/auth/users/{id}', methods: ['DELETE'])]
+    public function deleteUser($id, EntityManagerInterface $em)
+    {
+        $user = $this->em->getRepository(User::class)->find($id);
+
+        if (!$user) {
+            return $this->json([
+                'estado' => 'error',
+                'mensaje' => 'Usuario no encontrado'
+            ], Response::HTTP_NOT_FOUND);
+        }
+
+        try {
+            $this->em->remove($user);
+            $this->em->flush();
+
+            return $this->json([
+                'estado' => 'ok',
+                'mensaje' => 'Usuario eliminado correctamente'
+            ], Response::HTTP_OK);
+        } catch (\Exception $e) {
+            return $this->json([
+                'estado' => 'error',
+                'mensaje' => 'Error al eliminar usuario: ' . $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    #[Route('/auth/users/{id}/change-role', methods: ['PATCH'])]
+    public function changeUserRole(int $id, Request $request): JsonResponse
+    {
+        $user = $this->em->getRepository(User::class)->find($id);
+
+        if (!$user) {
+            return $this->json([
+                'estado' => 'error',
+                'mensaje' => 'Usuario no encontrado'
+            ], Response::HTTP_NOT_FOUND);
+        }
+
+        $data = json_decode($request->getContent(), true);
+
+        if (!isset($data['role'])) {
+            return $this->json([
+                'estado' => 'error',
+                'mensaje' => 'Rol requerido'
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+        $rolesPermitidos = ['ROLE_USER', 'ROLE_ADMIN', 'ROLE_SUPERADMIN'];
+
+        if (!in_array($data['role'], $rolesPermitidos)) {
+            return $this->json([
+                'estado' => 'error',
+                'mensaje' => 'Rol no válido'
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+        try {
+            $user->setRoles([$data['role']]);
+            $this->em->flush();
+
+            return $this->json([
+                'estado' => 'ok',
+                'mensaje' => 'Rol actualizado correctamente',
+                'data' => [
+                    'id' => $user->getId(),
+                    'name' => $user->getName(),
+                    'email' => $user->getEmail(),
+                    'roles' => $user->getRoles(),
+                    'estado' => $user->getEstado()->getNombre(),
+                ]
+            ], Response::HTTP_OK);
+        } catch (\Exception $e) {
+            return $this->json([
+                'estado' => 'error',
+                'mensaje' => 'Error al cambiar rol: ' . $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 }
