@@ -10,7 +10,7 @@ import { MislistasComponent } from './paginas/mislistas/mislistas.component';
 import { PerfilComponent } from './paginas/perfil/perfil.component';
 import { ReviewsComponent } from './paginas/reviews/reviews.component';
 import { RecomendadosComponent } from './paginas/recomendados/recomendados.component';
-import { GestionlibrosComponent } from './paginas/gestionlibros/gestionlibros.component';
+import { GestionLibrosComponent } from './paginas/gestionlibros/gestionlibros.component';
 import { GestionreviewsComponent } from './paginas/gestionreviews/gestionreviews.component';
 import { GestionusuariosComponent } from './paginas/gestionusuarios/gestionusuarios.component';
 
@@ -26,7 +26,7 @@ export const routes: Routes = [
     {path: "perfil", component: PerfilComponent},
     {path: "reviews", component: ReviewsComponent},
     // {path: "recomendados", component: RecomendadosComponent},
-    {path: "gestionlibros", component: GestionlibrosComponent},
+    {path: "gestionlibros", component: GestionLibrosComponent},
     {path: "gestionreviews", component: GestionreviewsComponent},
     {path: "gestionusuarios", component: GestionusuariosComponent},
 ];

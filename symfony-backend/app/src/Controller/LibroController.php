@@ -61,10 +61,9 @@ class LibroController extends AbstractController
 
             // ✅ USAR GRUPOS DE SERIALIZACIÓN
             return $this->json($libro, 201, [], ['groups' => ['libro:read']]);
-
         } catch (\Exception $e) {
             error_log('Error en buscarLibro: ' . $e->getMessage());
-            
+
             return new JsonResponse([
                 'error' => 'Error interno del servidor'
             ], 500);
@@ -143,6 +142,27 @@ class LibroController extends AbstractController
             return $this->json($libro, 200, [], ['groups' => ['libro:read']]);
         } catch (\Exception $e) {
             error_log('Error al obtener libro: ' . $e->getMessage());
+            return new JsonResponse(['error' => 'Error interno del servidor'], 500);
+        }
+    }
+
+
+    #[Route('/libros/{id}', name: 'eliminar_libro', methods: ['DELETE'])]
+    public function eliminarLibro(int $id, EntityManagerInterface $em): JsonResponse
+    {
+        try {
+            $libro = $em->getRepository(Libro::class)->find($id);
+
+            if (!$libro) {
+                return new JsonResponse(['error' => 'Libro no encontrado'], 404);
+            }
+
+            $em->remove($libro);
+            $em->flush();
+
+            return new JsonResponse(['mensaje' => 'Libro eliminado correctamente'], 200);
+        } catch (\Exception $e) {
+            error_log('Error al eliminar libro: ' . $e->getMessage());
             return new JsonResponse(['error' => 'Error interno del servidor'], 500);
         }
     }

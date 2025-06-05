@@ -32,4 +32,27 @@ export class LibroService {
       })
     );
   }
+
+  
+  listarLibros(): Observable<LibroInterface[]> {
+    return this.http.get<LibroInterface[]>(`${this.baseUrl}`).pipe(
+      catchError((error) => {
+        console.error('Error al listar libros:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+ 
+  eliminarLibro(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${id}`).pipe(
+      catchError((error) => {
+        console.error(`Error al eliminar libro con ID ${id}:`, error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+
+  
 }
