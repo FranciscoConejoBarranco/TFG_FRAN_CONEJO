@@ -3,8 +3,8 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from '../../../environment/environment';
-import { ReviewInterface } from '../interfaces/review.interface';
-// import { ReviewsPorLibroResponse } from '../interfaces/review';
+import { ReviewInterface } from '../../shared/interfaces/review';
+import { ReviewsResponse } from '../interfaces/review';
 
 @Injectable({
   providedIn: 'root',
@@ -124,4 +124,16 @@ export class ReviewService {
       }
     );
   }
+
+
+  obtenerTodasReviews(page: number = 1, limit: number = 10): Observable<ReviewsResponse> {
+    const params = new HttpParams()
+      .set('page', page.toString())
+      .set('limit', limit.toString());
+    return this._http.get<ReviewsResponse>(`${environment.api}api/reviews`, {
+      params,
+      withCredentials: true,
+    });
+  }
+  
 }

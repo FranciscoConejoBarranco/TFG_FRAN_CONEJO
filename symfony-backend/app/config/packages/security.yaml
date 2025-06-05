@@ -42,7 +42,7 @@ security:
         - { path: ^/importar-libros, roles: PUBLIC_ACCESS}
         
         # Todas las rutas de API requieren autenticación
-        - { path: ^/api, roles: ROLE_USER }
+        - { path: ^/api, roles: [ROLE_USER, ROLE_SUPERADMIN] }
 
 when@test:
     security:
