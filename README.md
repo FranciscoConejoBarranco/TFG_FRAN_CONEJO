@@ -1,96 +1,123 @@
 
-# 📚 Despliegue de una Aplicación Symfony y Angular con Docker Compose
-Este proyecto utiliza Docker y Docker Compose para desplegar una aplicación que incluye un backend Symfony, un frontend Angular y una base de datos PostgreSQL de manera rápida y sencilla.
+# 📚 TFG - BUBOOKS 
+
+Este proyecto es el resultado de mi Trabajo de Fin de Grado y consiste en una aplicación web de biblioteca digital. Está desarrollada con **Symfony** para el backend, **Angular** para el frontend y utiliza **PostgreSQL** como base de datos. Todo funciona dentro de contenedores usando **Docker Compose**, así que no hace falta instalar nada raro en el ordenador.
+
 
 ---
 
-## 🛠️ Requisitos Previos
-Antes de comenzar, asegúrate de tener instalados en tu sistema:
+## 🚀 Cómo desplegar la aplicación
 
-- [Docker](https://docs.docker.com/get-docker/)
-- [Docker Compose](https://docs.docker.com/compose/install/)
----
+### 1. Clona el repositorio
 
-## 🚀 Instalación y Puesta en Marcha
-
-### 1️⃣ Clonar el repositorio
-Ejecuta el siguiente comando para clonar el proyecto:
-```bash
-git clone git@github.com:campus-CodeArts/Onboarding-SymfAngular.git
-cd Onboarding-SymfAngular
 ```
 
-### 2️⃣ Levantar los contenedores
-Para iniciar los servicios en segundo plano, ejecuta:
-```bash
+git clone git@github.com:FranciscoConejoBarranco/TFG_FRAN_CONEJO.git
+cd TFG_FRAN_CONEJO
+
+```
+
+### 2. Arranca los contenedores
+
+```
+
 docker-compose up -d
-```
-📌 **Nota:** La primera vez que inicies los servicios, puede tardar unos minutos en configurarse completamente.
 
-### 3️⃣ Verificar que los contenedores están corriendo
-Comprueba el estado de los contenedores con:
-```bash
+```
+
+La primera vez puede tardar un poco porque se descargan las imágenes y se instalan todas las dependencias.
+
+### 3. Comprueba que todo está en marcha
+
+```
+
 docker ps
-```
-Deberías ver tres contenedores en ejecución: **PostgreSQL**, **Symfony (backend)** y **Angular (frontend)**.
 
-### 4️⃣ Acceder a la aplicación
-- **Frontend:** Abre la siguiente URL en tu navegador:
-  ```
-  http://localhost:4200
-  ```
-- **Backend (Symfony):** Puedes ver la salida de Symfony desde:
-  ```
-  http://localhost:8000
-  ```
-- **Base de datos PostgreSQL:** El contenedor de la base de datos está en el puerto 5432, aunque normalmente no es necesario acceder directamente a este servicio en un navegador.
+```
+
+Deberían aparecer tres contenedores: uno para el backend (Symfony), otro para el frontend (Angular) y otro para la base de datos (PostgreSQL).
 
 ---
 
-## 🔄 Detener y Reiniciar los Contenedores
-Si deseas detener los contenedores en ejecución:
-```bash
-docker-compose down
-```
-Para volver a iniciarlos:
-```bash
-docker-compose up -d
-```
+## 🌐 Acceso a la aplicación
+
+- **Frontend Angular:**  
+  [http://localhost:4200](http://localhost:4200)
+
+- **Backend Symfony (API):**  
+  [http://localhost:8000](http://localhost:8000)
+
+- **Base de datos PostgreSQL:**  
+  Está en el puerto 5432 (normalmente no hace falta acceder directamente).
+
+Nada más levantar los contenedores, ya hay 100 libros cargados para poder probar la búsqueda y el resto de funcionalidades.
 
 ---
 
-## 🧹 Eliminar los Contenedores y Datos Persistentes
-Si quieres eliminar los contenedores junto con los volúmenes y datos almacenados:
-```bash
-docker-compose down -v
-```
-⚠️ **Advertencia:** Esto eliminará todos los datos almacenados en la base de datos PostgreSQL.
+## 📂 Estructura del proyecto
+
+- `symfony-backend`: Aquí está el código del backend y la API.
+- `angular-frontend`: Todo el código del frontend en Angular.
+- `docker/`: Archivos de configuración y scripts de inicialización.
 
 ---
 
-## 🎯 Notas Finales
-- Para ver los registros en tiempo real:
-  ```bash
-  docker-compose logs -f
-  ```
+## 🗃️ Datos de ejemplo
 
-Para más información sobre **Symfony**, **Angular** o **PostgreSQL**, consulta sus respectivas documentaciones oficiales.
+Al iniciar el proyecto, la base de datos se rellena automáticamente con 100 libros de ejemplo, incluyendo título, autor, género, sinopsis y la portada (imagen).
 
-## Comandos útiles
+---
 
-- Para acceder al contenedor del Frontend Angular:
-```
-  docker exec -it angular_frontend sh
+## 🔧 Comandos útiles
+
+- **Ver logs en tiempo real:**
 ```
 
-- Para acceder al contenedor del Backend Symfony:
+docker-compose logs -f
+
 ```
+- **Entrar al contenedor de Angular:**
+```
+
+docker exec -it angular_frontend sh
+
+```
+- **Entrar al contenedor de Symfony:**
+```
+
 docker exec -it symfony_backend bash
-```
-- Si no tienes problemas de permisos para levantar un contenedor, prueba a ejecutar el siguiente comando:
 
 ```
-sudo chmod 775 -R (contenedor_de_Symfony_o_Angular_frontend)
-Ej:
-sudo chmod 775 -R angular-frontend
+- **Detener los servicios:**
 ```
+
+docker-compose down
+
+```
+- **Eliminar todo (incluyendo datos de la base de datos):**
+```
+
+docker-compose down -v
+
+```
+
+---
+
+## 📝 Notas
+
+- El proyecto está pensado para funcionar igual en cualquier ordenador que tenga Docker.
+- Si tienes problemas de permisos con las carpetas compartidas, puedes probar:
+```
+
+sudo chmod 775 -R nombre_carpeta
+
+```
+- Si algo no funciona, revisa los logs con `docker-compose logs -f`.
+
+---
+
+## 📎 Enlace al TFG
+
+[Repositorio del TFG en GitHub](https://github.com/FranciscoConejoBarranco/TFG_FRAN_CONEJO)
+
+---
