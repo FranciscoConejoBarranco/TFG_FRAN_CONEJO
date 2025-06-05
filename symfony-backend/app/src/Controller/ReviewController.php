@@ -84,10 +84,15 @@ class ReviewController extends AbstractController
     public function eliminarReview(int $id, EntityManagerInterface $em): JsonResponse
     {
         $usuario = $this->getUser();
-        $review = $em->getRepository(Review::class)->findOneBy(['id' => $id, 'usuario' => $usuario]);
+        $review = $em->getRepository(Review::class)->find($id);
 
         if (!$review) {
-            return $this->json(['message' => 'Review no encontrada o no te pertenece.'], 404);
+            return $this->json(['message' => 'Review no encontrada.'], 404);
+        }
+
+        // Solo permitir editar si es el autor o superadmin
+        if ($review->getUsuario() !== $usuario && !$this->isGranted('ROLE_SUPERADMIN')) {
+            return $this->json(['message' => 'No tienes permiso para editar esta review.'], 403);
         }
 
         $em->remove($review);

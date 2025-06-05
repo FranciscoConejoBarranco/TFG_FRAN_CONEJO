@@ -1,93 +1,119 @@
 <app-navbar-dashboard />
 
-<div class="bg-black min-h-screen text-white overflow-x-hidden max-w-screen px-4 py-10 sm:pl-72">
-  <h2 class="text-xl sm:text-2xl font-semibold mb-6">Gestión de Reseñas</h2>
+<div class="bg-gradient-to-br from-gray-900 via-black to-gray-900 min-h-screen text-white overflow-x-hidden">
+  <main class="flex-1 p-6 sm:ml-64 max-sm:ml-0 sm:p-10">
+    <!-- Header -->
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent mb-2">
+        Gestión de Reseñas
+      </h1>
+      <p class="text-gray-400">Administra las reseñas del sistema</p>
+    </div>
 
-  <div *ngIf="loading" class="flex justify-center items-center py-20">
-    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
-    <span class="ml-3 text-gray-400">Cargando reviews...</span>
-  </div>
+    <!-- Loading state -->
+    <div *ngIf="loading" class="flex justify-center items-center py-20">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+      <span class="ml-3 text-gray-400">Cargando reviews...</span>
+    </div>
 
-  <div *ngIf="!loading" class="bg-neutral-800 rounded-lg p-4 shadow-md">
-    <table mat-table [dataSource]="dataSource" matSort class="w-full">
-      <!-- ID -->
-      <ng-container matColumnDef="id">
-        <th mat-header-cell *matHeaderCellDef>ID</th>
-        <td mat-cell *matCellDef="let review">#{{ review.id }}</td>
-      </ng-container>
-      <!-- Libro -->
-      <ng-container matColumnDef="libro">
-        <th mat-header-cell *matHeaderCellDef>Libro</th>
-        <td mat-cell *matCellDef="let review">
-          <span>{{ review.libro?.titulo }}</span>
-        </td>
-      </ng-container>
-      <!-- Contenido -->
-      <ng-container matColumnDef="contenido">
-        <th mat-header-cell *matHeaderCellDef>Comentario</th>
-        <td mat-cell *matCellDef="let review">{{ review.contenido }}</td>
-      </ng-container>
-      <!-- Valoración -->
-      <ng-container matColumnDef="valoracion">
-        <th mat-header-cell *matHeaderCellDef>Valoración</th>
-        <td mat-cell *matCellDef="let review">
-          <span class="text-yellow-400">⭐ {{ review.valoracion }}</span>
-        </td>
-      </ng-container>
-      <!-- Fecha -->
-      <ng-container matColumnDef="fecha">
-        <th mat-header-cell *matHeaderCellDef>Fecha</th>
-        <td mat-cell *matCellDef="let review">{{ review.fecha }}</td>
-      </ng-container>
-      <!-- Acciones -->
-      <ng-container matColumnDef="acciones">
-        <th mat-header-cell *matHeaderCellDef>Acciones</th>
-        <td mat-cell *matCellDef="let review">
-          <button (click)="editarReview(review)" class="bg-blue-600 hover:bg-blue-700 rounded px-3 py-1 mr-2">Editar</button>
-          <button (click)="eliminarReview(review)" class="bg-red-600 hover:bg-red-700 rounded px-3 py-1">Eliminar</button>
-        </td>
-      </ng-container>
-
-      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-    </table>
-
-    <mat-paginator [length]="totalItems" [pageSize]="itemsPerPage" [pageIndex]="currentPage - 1"
-      [pageSizeOptions]="[5, 10]" (page)="onPageChange($event)" showFirstLastButtons>
-    </mat-paginator>
-  </div>
+    <!-- Tabla de reviews -->
+    <div *ngIf="!loading" class="bg-gray-800/50 backdrop-blur-sm rounded-xl border border-gray-700/50 overflow-hidden">
+      <div class="overflow-x-auto">
+        <table mat-table [dataSource]="dataSource" matSort class="w-full">
+          <!-- ID -->
+          <ng-container matColumnDef="id">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header class="bg-gray-700 text-white font-semibold p-4">ID</th>
+            <td mat-cell *matCellDef="let review" class="p-4 text-gray-300">#{{ review.id }}</td>
+          </ng-container>
+          <!-- Libro -->
+          <ng-container matColumnDef="libro">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header class="bg-gray-700 text-white font-semibold p-4">Libro</th>
+            <td mat-cell *matCellDef="let review" class="p-4">
+              <span class="font-medium text-white">{{ review.libro?.titulo }}</span>
+              <span class="ml-2 text-xs text-gray-400">({{ review.libro?.autor }})</span>
+            </td>
+          </ng-container>
+          <!-- Contenido -->
+          <ng-container matColumnDef="contenido">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header class="bg-gray-700 text-white font-semibold p-4">Comentario</th>
+            <td mat-cell *matCellDef="let review" class="p-4 text-gray-300 italic">"{{ review.contenido }}"</td>
+          </ng-container>
+          <!-- Valoración -->
+          <ng-container matColumnDef="valoracion">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header class="bg-gray-700 text-white font-semibold p-4">Valoración</th>
+            <td mat-cell *matCellDef="let review" class="p-4">
+              <span class="text-yellow-400 font-semibold">⭐ {{ review.valoracion }}</span>
+            </td>
+          </ng-container>
+          <!-- Fecha -->
+          <ng-container matColumnDef="fecha">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header class="bg-gray-700 text-white font-semibold p-4">Fecha</th>
+            <td mat-cell *matCellDef="let review" class="p-4 text-gray-400">{{ review.fecha }}</td>
+          </ng-container>
+          <!-- Acciones -->
+          <ng-container matColumnDef="acciones">
+            <th mat-header-cell *matHeaderCellDef class="bg-gray-700 text-white font-semibold p-4">Acciones</th>
+            <td mat-cell *matCellDef="let review" class="p-4">
+              <div class="flex gap-2">
+                <button (click)="editarReview(review)" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-lg text-sm transition-colors flex items-center gap-1">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                  </svg>
+                  Editar
+                </button>
+                <button (click)="eliminarReview(review)" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-lg text-sm transition-colors flex items-center gap-1">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                  </svg>
+                  Eliminar
+                </button>
+              </div>
+            </td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns" class="hover:bg-gray-700/30 transition-colors border-b border-gray-700/50"></tr>
+        </table>
+      </div>
+      <!-- Paginador -->
+      <div class="bg-gray-700/30 p-4">
+        <mat-paginator [length]="totalItems" [pageSize]="itemsPerPage" [pageIndex]="currentPage - 1"
+          [pageSizeOptions]="[5, 10]" [showFirstLastButtons]="true" (page)="onPageChange($event)">
+        </mat-paginator>
+      </div>
+    </div>
+  </main>
 
   <!-- Modal editar review -->
-  <div *ngIf="mostrarDialogoEditar" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+  <div *ngIf="mostrarDialogoEditar" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
     <div class="bg-gray-800 rounded-xl p-6 w-full max-w-md border border-gray-700">
       <h2 class="text-xl font-semibold mb-4 text-white">Editar Review</h2>
       <form [formGroup]="reviewForm" class="space-y-4">
         <div>
           <label class="block text-sm font-medium text-gray-300 mb-2">Comentario</label>
-          <textarea formControlName="contenido" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white"></textarea>
+          <textarea formControlName="contenido" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"></textarea>
         </div>
         <div>
           <label class="block text-sm font-medium text-gray-300 mb-2">Valoración</label>
-          <input type="number" formControlName="valoracion" min="1" max="5" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white"/>
+          <input type="number" formControlName="valoracion" min="1" max="5" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"/>
         </div>
       </form>
       <div class="flex justify-end gap-3 mt-6">
-        <button (click)="cerrarDialogoEditar()" class="px-4 py-2 text-gray-400 hover:text-white">Cancelar</button>
-        <button (click)="guardarReview()" [disabled]="!reviewForm.valid" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">Guardar</button>
+        <button (click)="cerrarDialogoEditar()" class="px-4 py-2 text-gray-400 hover:text-white transition-colors">Cancelar</button>
+        <button (click)="guardarReview()" [disabled]="!reviewForm.valid" class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white px-4 py-2 rounded-lg transition-colors">Guardar</button>
       </div>
     </div>
   </div>
 
   <!-- Modal eliminar review -->
-  <div *ngIf="mostrarDialogoEliminar" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+  <div *ngIf="mostrarDialogoEliminar" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
     <div class="bg-gray-800 rounded-xl p-6 w-full max-w-md border border-gray-700">
       <h2 class="text-xl font-semibold text-red-400 mb-4">Confirmar Eliminación</h2>
       <div class="mb-6">
         <p class="text-gray-300">¿Estás seguro de que deseas eliminar esta review?</p>
       </div>
       <div class="flex justify-end gap-3">
-        <button (click)="cerrarDialogoEliminar()" class="px-4 py-2 text-gray-400 hover:text-white">Cancelar</button>
-        <button (click)="confirmarEliminacion()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg">Eliminar</button>
+        <button (click)="cerrarDialogoEliminar()" class="px-4 py-2 text-gray-400 hover:text-white transition-colors">Cancelar</button>
+        <button (click)="confirmarEliminacion()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors">Eliminar</button>
       </div>
     </div>
   </div>
