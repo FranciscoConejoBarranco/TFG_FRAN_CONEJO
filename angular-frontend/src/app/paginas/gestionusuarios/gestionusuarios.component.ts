@@ -208,12 +208,16 @@ export class GestionusuariosComponent implements OnInit {
   guardarUsuario(): void {
     if (this.usuarioForm.valid && this.usuarioEditando) {
       const formValue = this.usuarioForm.value;
-      // Si el backend espera un array, asegúrate de que 'roles' sea un array:
-      formValue.roles = [formValue.roles];
+      // Si el campo roles es un array, no lo modifiques
+      if (!Array.isArray(formValue.roles)) {
+        formValue.roles = [formValue.roles];
+      }
+      console.log('Datos enviados al backend:', formValue); // <-- Añade este log
       this.actualizarUsuario(this.usuarioEditando.id, formValue);
       this.cerrarDialogoEditar();
     }
   }
+  
 
   actualizarUsuario(id: number, datos: Partial<UsuarioInterface>): void {
     this.usuarioService.actualizarUsuario(id, datos).subscribe({
